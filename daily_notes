@@ -1,0 +1,8 @@
+4/22/2025:
+Wanted to make a simple game, investigated pyxel
+Started by creating a movable ball, added velocity, acceleration, and friction
+Added wall boundaries, made the walls bouncy
+Created other non-player balls for the player to eat as a score objective, made balls have variable colors and gravity
+
+Maybe make it 3 modes, 1 is survival where you avoid balls, another you start large and get smaller every hit, last is the current eating game
+Magnet to pull balls off screen sometimes pop up
