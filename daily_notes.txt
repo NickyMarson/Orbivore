@@ -6,3 +6,9 @@ Created other non-player balls for the player to eat as a score objective, made 
 
 Maybe make it 3 modes, 1 is survival where you avoid balls, another you start large and get smaller every hit, last is the current eating game
 Magnet to pull balls off screen sometimes pop up
+
+5/11/2025:
+Added a main menu to start the game, view leaderboards, and settings
+Added some memory issue prevention by clearing objects when preesing M to go back to the Menu from the Game state
+
+If memory issues were to pop up (very unlikely) then change collision detection formula to have less calculations and add spatial partioning
