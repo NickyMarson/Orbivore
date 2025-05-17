@@ -12,3 +12,8 @@ Added a main menu to start the game, view leaderboards, and settings
 Added some memory issue prevention by clearing objects when preesing M to go back to the Menu from the Game state
 
 If memory issues were to pop up (very unlikely) then change collision detection formula to have less calculations and add spatial partioning
+
+5/17/2025:
+Changed menus to be grid patterns with 2 columns
+Added both vertical and horizontal wraparound on the grid
+Previous column is remembered in grids with odd numbered options and will move to corresponding row/col correctly based on where it came from
