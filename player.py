@@ -20,8 +20,15 @@ class Player:
         self.vx += ax * self.accel # Apply acceleration to the velocity
         self.vy += ay * self.accel
 
-        self.vx = max(-self.max_speed, min(self.vx, self.max_speed)) # Clamp velocity to +/- max_speed
-        self.vy = max(-self.max_speed, min(self.vy, self.max_speed))
+        speed = (self.vx ** 2 + self.vy ** 2) ** 0.5 # Clamp velocity to +/- max_speed
+        if speed > self.max_speed:
+            scale = self.max_speed / speed
+            self.vx *= scale # Account for diaginal movement speed > single direction movement
+            self.vy *= scale
+
+
+        #self.vx = max(-self.max_speed, min(self.vx, self.max_speed)) # Clamp velocity to +/- max_speed
+        #self.vy = max(-self.max_speed, min(self.vy, self.max_speed))
 
         self.x += self.vx # Move player by velocity
         self.y += self.vy
