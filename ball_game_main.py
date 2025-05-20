@@ -60,8 +60,8 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
     row = selected_index // columns # Current row
     col = selected_index % columns # Current column
 
-    # Clamp the column if invalid for the given row
-    def clamp_to_valid_index(new_r, c):
+    # Clamp the column if invalid index for the given row
+    def clampToValidIndex(new_r, c):
         idx = new_r * columns + c
         if idx >= options_length: # Clamp col to last valid index on this row
             last_col_in_row = (options_length - 1) % columns
@@ -71,12 +71,12 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
     # Current selected option logic based on player input key, has vertical and horizontal wraparound
     if pyxel.btnp(key_up): # Move up, wrap from first row to last row in same column, if possible
         new_row = (row - 1) % rows
-        new_index = clamp_to_valid_index(new_row, prev_col)
+        new_index = clampToValidIndex(new_row, prev_col)
         return new_index, prev_col
     
     elif pyxel.btnp(key_down): # Move down, wrap from last row to first row in same column
         new_row = (row + 1) % rows
-        new_index = clamp_to_valid_index(new_row, prev_col)
+        new_index = clampToValidIndex(new_row, prev_col)
         return new_index, prev_col
     
     elif pyxel.btnp(key_left): # Move left, wrap from leftmost column to rightmost column of same row
@@ -85,7 +85,7 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
 
         if row == rows - 1 and items_in_row == 1: # If last row, only one option, go up to previous row at col 0
             if row > 0:
-                new_index = clamp_to_valid_index(row - 1, 0)
+                new_index = clampToValidIndex(row - 1, 0)
                 return new_index, 0
 
         if col > 0:
@@ -93,7 +93,6 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
         else: # Wrap to rightmost column of the same row
             col = (options_length - 1) % columns if (row == rows - 1) else columns - 1
 
-        #items_in_row = min(columns, options_length - row * columns)
         if items_in_row > 1: # Update prev_col for vertical wraparound
             prev_col = col
 
@@ -105,7 +104,7 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
 
         if row == rows - 1 and items_in_row == 1: # If last row, only one option, go up to previous row at col 1
             if row > 0 and columns > 1:
-                new_index = clamp_to_valid_index(row - 1, 1)
+                new_index = clampToValidIndex(row - 1, 1)
                 return new_index, 1
 
         if col < columns - 1 and (row * columns + col + 1) < options_length:
@@ -113,7 +112,6 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
         else: # Wrap to leftmost column of the same row, always 0
             col = 0
 
-        #items_in_row = min(columns, options_length - row * columns)
         if items_in_row > 1: # Update prev_col for vertical wraparound
             prev_col = col
 
@@ -127,17 +125,30 @@ class App:
     def __init__(self): # Constructor for the App class
         pyxel.init(256, 256, title="Salutations Huzz", quit_key=pyxel.KEY_ESCAPE) # Initialize window (Width, Height, Quit Key)
 
-        self.state = "menu" # Start on menu
+        self.current_state = "menu" # Start on menu
+        self.state_stack = [] # Tracks state path like ['menu', 'settings']
+        self.cursor_map = {"menu": 0} # Tracks selected_option per state, start on menu at position 0
+        self.prev_col_map = {} # Tracks previous column
+
+
 
         self.menu_options = ["Start", "Leaderboards", "Settings"]
         self.leaderboard_options = ["Gurt: Yo", "Yo: Gurt", "Rt: Ts is option 3", "3: WHAAAAAT"]
         self.setting_options = ["Controls", "Volume", "Graphics", "Aspect Ratio", "Windowed or Borderless", "FPS Display"]
         self.graphics_options = ["Main Menu Balls", "Colorblind Mode"]
+        self.volume_options = ["Master Volume", "Other Volume (TBD)"]
 
-        self.selected_index = 0 # Set current menu selected option to 0 (top left)
-        self.prev_col_menu = 0 # Set current main menu selected column to 0 (top left)
-        self.prev_col_leaderboard = 0 # Set current Leaderboard menu selected column to 0 (top left)
-        self.prev_col_settings = 0 # # Set current Settings menu selected column to 0 (top left)
+        self.selected_menu = 0 # Set current main menu selected option to 0 (top left)
+        self.selected_leaderboard = 0 # Set current Leaderboard menu selected option to 0 (top left)
+        self.selected_settings = 0
+        self.selected_graphics = 0
+        self.selected_volume = 0
+
+        self.prev_col_menu = 0 # Set last main menu selected column to 0 (top left)
+        self.prev_col_leaderboard = 0 # Set last Leaderboard menu selected column to 0 (top left)
+        self.prev_col_settings = 0
+        self.prev_col_graphics = 0
+        self.prev_col_volume = 0
 
         self.last_fps_time = pyxel.frame_count # Track FPS
         self.fps = 0
@@ -154,22 +165,29 @@ class App:
             pyxel.quit()
 
         # Check which state is active and update it
-        if self.state == "menu":
+        if self.current_state == "menu":
             self.updateMenu()
-        if self.state == "game":
+        if self.current_state == "game":
             self.updateGame()
-        elif self.state == "leaderboards":
+        elif self.current_state == "leaderboards":
             self.updateLeaderboards()
-        elif self.state == "settings":
+        elif self.current_state == "settings":
             self.updateSettings()
+        elif self.current_state == "graphics":
+            self.updateGraphics()
+        elif self.current_state == "volume":
+            self.updateVolume()
 
         if pyxel.frame_count - self.last_fps_time >= 30:
             self.fps = 30 # Pyxel runs at a fixed 30 FPS
             self.last_fps_time = pyxel.frame_count # Count number of frames to get FPS
 
     def updateMenu(self): # Update menu state
-        self.selected_index, self.prev_col_menu = handleGridSelection(pyxel.KEY_UP, pyxel.KEY_DOWN, pyxel.KEY_LEFT, pyxel.KEY_RIGHT,
-        self.selected_index, len(self.menu_options), 2, self.prev_col_menu)
+        new_index, new_prev_col = self.changeCursorPosition(len(self.menu_options), 2, self.current_state, self.current_state)
+        
+        self.selected_menu = new_index # Update cursor position
+        self.prev_col_menu = new_prev_col # Update previous column index
+        self.prev_col = new_prev_col
 
         self.menu_spawn_timer += 1 # Increment spawn timer every frame
 
@@ -182,39 +200,69 @@ class App:
             ball.update()
 
         if pyxel.btnp(pyxel.KEY_RETURN):
-            selected_option = self.menu_options[self.selected_index]
+            selected_option = self.menu_options[self.selected_menu]
 
             if selected_option == "Start":
                 self.clearMenu() # Delete objects from main menu
                 self.startGame() # Initialize objects for game
             elif selected_option == "Leaderboards":
-                self.state = "leaderboards" # Change state to leaderboards
+                self.enter_state("leaderboards") # Change state to leaderboards
             elif selected_option == "Settings":
-                self.state = "settings" # Change state to settings
+                self.enter_state("settings") # Change state to settings
 
     def updateLeaderboards(self):
-        if not hasattr(self, "selected_leaderboard"):
-            self.selected_leaderboard = 0
-
-        self.selected_leaderboard, self.prev_col_leaderboard = handleGridSelection(pyxel.KEY_UP, pyxel.KEY_DOWN, pyxel.KEY_LEFT, pyxel.KEY_RIGHT,
-        self.selected_leaderboard, len(self.leaderboard_options), 2, self.prev_col_leaderboard)
+        new_index, new_prev_col = self.changeCursorPosition(len(self.leaderboard_options), 2, self.current_state, self.current_state)
+        
+        self.selected_leaderboard = new_index # Update cursor position
+        self.prev_col_leaderboard = new_prev_col # Update previous column index
+        self.prev_col = new_prev_col
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
-            self.state = "menu"
+            self.exit_state()
 
     def updateSettings(self):
-        if not hasattr(self, "selected_settings"):
-            self.selected_settings = 0
+        new_index, new_prev_col = self.changeCursorPosition(len(self.setting_options), 2, self.current_state, self.current_state)
+        
+        self.selected_settings = new_index # Update cursor position
+        self.prev_col_settings = new_prev_col # Update previous column index
+        self.prev_col = new_prev_col
 
-        self.selected_settings, self.prev_col_settings = handleGridSelection(pyxel.KEY_UP, pyxel.KEY_DOWN, pyxel.KEY_LEFT, pyxel.KEY_RIGHT,
-        self.selected_settings, len(self.setting_options), 2, self.prev_col_settings)
+        if pyxel.btnp(pyxel.KEY_RETURN):
+            selected_option = self.setting_options[self.selected_settings]
+
+            #if selected_option == "Controls":
+                #self.enter_state("controls") # Change state to controls
+            if selected_option == "Graphics":
+                self.enter_state("graphics") # Change state to graphics
+            elif selected_option == "Volume":
+                self.enter_state("volume") # Change state to volume
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
-            self.state = "menu"
+            self.exit_state()
+
+    def updateGraphics(self):
+        new_index, new_prev_col = self.changeCursorPosition(len(self.menu_options), 2, self.current_state, self.current_state)
+        
+        self.selected_graphics = new_index # Update cursor position
+        self.prev_col_graphics = new_prev_col # Update previous column index
+        self.prev_col = new_prev_col
+
+        if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to settings
+            self.exit_state()
+
+    def updateVolume(self):
+        new_index, new_prev_col = self.changeCursorPosition(len(self.menu_options), 2, self.current_state, self.current_state)
+        
+        self.selected_volume = new_index # Update cursor position
+        self.prev_col_volume = new_prev_col # Update previous column index
+        self.prev_col = new_prev_col
+
+        if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to settings
+            self.exit_state()
 
     def updateGame(self): # Update game state
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
-            self.state = "menu"
+            self.exit_state()
             self.clearGame() # Clear game objects to free memory
             return
 
@@ -243,26 +291,30 @@ class App:
         pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
 
         # Check which state is active and draw it
-        if self.state == "menu":
+        if self.current_state == "menu":
             self.drawMenu()
-        elif self.state == "game":
+        elif self.current_state == "game":
             self.drawGame()
-        elif self.state == "leaderboards":
+        elif self.current_state == "leaderboards":
             self.drawLeaderboards()
-        elif self.state == "settings":
+        elif self.current_state == "settings":
             self.drawSettings()
+        elif self.current_state == "graphics":
+            self.drawGraphics()
+        elif self.current_state == "volume":
+            self.drawVolume()
 
     def drawMenu(self): # Draws menu
         for ball in self.menu_balls:
             ball.draw()
 
-        drawOptionList(title="Orbivore", options=self.menu_options, selected_index=self.selected_index,
+        drawOptionList(title="Orbivore", options=self.menu_options, selected_index=self.selected_menu,
         y_start=100, spacing_x=50, spacing_y=20, color_selected_bg=6, color_selected_text=0, color_unselected_text=7)
 
         menu_instruction = "Use arrow keys to move between options, ENTER to confirm"
         pyxel.text(centerTextHorizontal(menu_instruction), 180, menu_instruction, 5) # Menu instructions
     
-    def drawLeaderboards(self): # Draws Leaderboards menu
+    def drawLeaderboards(self):
         pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 7)
 
         self.selected_leaderboard = getattr(self, "selected_leaderboard", 0)  # Initialize if not set
@@ -270,7 +322,7 @@ class App:
         drawOptionList(title="Leaderboards", options=self.leaderboard_options, selected_index=self.selected_leaderboard,
         y_start=100, spacing_x=50, spacing_y=20, color_selected_bg=6, color_selected_text=0, color_unselected_text=7)
 
-        leaderboard_instruction = "Press M to return to menu"
+        leaderboard_instruction = "Press M to return to Menu"
         pyxel.text(centerTextHorizontal(leaderboard_instruction), 200, leaderboard_instruction, 5)
 
     def drawSettings(self):
@@ -279,8 +331,26 @@ class App:
         drawOptionList(title="Settings", options=self.setting_options, selected_index=self.selected_settings,
         y_start=100, spacing_x=30, spacing_y=20, color_selected_bg=6, color_selected_text=0, color_unselected_text=7)
 
-        settings_instruction = "Press M to return to menu"
+        settings_instruction = "Press M to return to Menu"
         pyxel.text(centerTextHorizontal(settings_instruction), 200, settings_instruction, 5)
+
+    def drawGraphics(self):
+        pyxel.text(centerTextHorizontal("Graphics"), 50, "Graphics", 7)
+
+        drawOptionList(title="Graphics", options=self.graphics_options, selected_index=self.selected_graphics,
+        y_start=100, spacing_x=30, spacing_y=20, color_selected_bg=6, color_selected_text=0, color_unselected_text=7)
+
+        graphics_instruction = "Press M to return to Settings"
+        pyxel.text(centerTextHorizontal(graphics_instruction), 200, graphics_instruction, 5)
+
+    def drawVolume(self):
+        pyxel.text(centerTextHorizontal("Volume"), 50, "Volume", 7)
+
+        drawOptionList(title="Volume", options=self.volume_options, selected_index=self.selected_volume,
+        y_start=100, spacing_x=30, spacing_y=20, color_selected_bg=6, color_selected_text=0, color_unselected_text=7)
+
+        volume_instruction = "Press M to return to Settings"
+        pyxel.text(centerTextHorizontal(volume_instruction), 200, volume_instruction, 5)
 
     def drawGame(self): # Draws game
         self.player.draw() # Draw player
@@ -292,7 +362,7 @@ class App:
     # --------------------OTHER APP FUNCTIONS--------------------
 
     def startGame(self): # Change to game state and initialize objects
-        self.state = "game" # Change to game state
+        self.enter_state("game") # Change to game state
         self.player = Player(80, 60) # Create an instance of a player at (X, Y)
         self.balls = [] # Array of balls
         self.spawn_timer = 0 # Set spawn timer to 0
@@ -315,5 +385,37 @@ class App:
     def clearMenu(self): # Clears main menu objects to stop possible memory issues
         self.menu_balls.clear()
         self.menu_spawn_timer = 0
+
+    def changeCursorPosition(self, options_length, columns, prev_col_map_key, cursor_map_key):
+        selected_index = self.cursor_map.get(cursor_map_key, 0) # Get cursor position or default to 0
+        prev_col = self.prev_col_map.get(prev_col_map_key, 0) # Get previous column index or default to 0
+
+        new_index, new_prev_col = handleGridSelection(pyxel.KEY_UP, pyxel.KEY_DOWN, pyxel.KEY_LEFT, pyxel.KEY_RIGHT,
+        selected_index, options_length, columns, prev_col)
+
+        self.cursor_map[cursor_map_key] = new_index # Update cursor position
+        self.prev_col_map[prev_col_map_key] = new_prev_col # Update previous column index
+
+        return new_index, new_prev_col
+
+    def enter_state(self, new_state): # Linked list approach to states and cursor position (enter state)
+        if self.current_state:
+            self.state_stack.append(self.current_state) # Append state that is being entered
+
+        self.selected_option = self.cursor_map.get(new_state, 0) # Get default cursor position for new state or default to 0
+        self.current_state = new_state # Update current state to appended state
+
+    def exit_state(self): # Linked list approach to states and cursor position (leave state)
+        if self.state_stack:
+            self.cursor_map[self.current_state] = self.selected_option # Remember current cursor position before exiting
+            self.prev_col_map[self.current_state] = self.prev_col # Remember current column index before exiting
+
+            self.cursor_map.pop(self.current_state, None) # Forget cursor position of exited state
+            self.prev_col_map.pop(self.current_state, None) # Forget column index of exited state
+
+            self.current_state = self.state_stack.pop() # Pop previous state from stack and switch back
+            self.selected_option = self.cursor_map.get(self.current_state, 0) # Get default cursor position for previous state or default to 0
+            self.prev_col = self.prev_col_map.get(self.current_state, 0) # Get default column index for previous state or default to 0
+
 
 App() # Creates an instance of the App class, calls constructor and runs game

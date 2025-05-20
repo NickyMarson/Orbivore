@@ -1,26 +1,50 @@
+Active Bugs:
+b2-el, b3-lm
+
+Squashed Bugs:
+b0-m, b1-mh
+
+-el = Extremely Low Priority, -l = Low Priority, -lm = Low/Medium Priority, -m = Medium Priority, -mh = Medium/High Priority,
+-h = High Priority, -c = Critical/Game Breaking
+
 4/22/2025:
-Wanted to make a simple game, investigated pyxel
-Started by creating a movable ball, added velocity, acceleration, and friction
-Added wall boundaries, made the walls bouncy
-Created other non-player balls for the player to eat as a score objective, made balls have variable colors and gravity
+- Wanted to make a simple game, investigated pyxel
+- Started by creating a movable ball, added velocity, acceleration, and friction
+- Added wall boundaries, made the walls bouncy
+- Created other non-player balls for the player to eat as a score objective, made balls have variable colors and gravity
 
 Maybe make it 3 modes, 1 is survival where you avoid balls, another you start large and get smaller every hit, last is the current eating game
 Magnet to pull balls off screen sometimes pop up
 
 5/11/2025:
-Added a main menu to start the game, view leaderboards, and settings
-Added some memory issue prevention by clearing objects when preesing M to go back to the Menu from the Game state
+- Added a main menu to start the game, view leaderboards, and settings
+- Added some memory issue prevention by clearing objects when preesing M to go back to the Menu from the Game state
 
 If memory issues were to pop up (very unlikely) then change collision detection formula to have less calculations and add spatial partioning
 
 5/17/2025:
-Changed menus to be grid patterns with 2 columns
-Added both vertical and horizontal wraparound on the grid
-Previous column is remembered in grids with odd numbered options and will move to corresponding row/col correctly based on where it came from
-Added balls falling on main menu
-Added flow diagram to help keep track of what needs to be completed and show progress
+- Changed menus to be grid patterns with 2 columns
+- Added both vertical and horizontal wraparound on the grid
+- Previous column is remembered in grids with odd numbered options and will move to corresponding row/col correctly based on where it came from
+- Added balls falling on main menu
+- Added flow diagram to help keep track of what needs to be completed and show progress
 
 Max memory usage of 41.9 MB and always 30 FPS with spawn cap reached on main menu,
 if the memory usage weren't tiny and FPS constantly at 30 then I would be very confused and concerned lol
 Implementing settings in game, then going to look into how to save those settings to a file to be read and used on program run
 Doing windowed/borderless setting next
+
+5/19/2025:
+- Fixed multidirectional movement being ~5.44 units/sec instead of being capped at 4 units/sec due to incorrect calculation/speed cap order (b0)
+- Changed M to be a back button instead of a menu button
+- Overhauled menu state navigation to be a state stack and cursor map to modularize design and fix below bug:
+Main Menu -> Settings -> Graphics, then M twice to reach Main Menu, then Enter on Settings moves to Graphics instead of Settings (b1)
+
+Known Bugs: Hovering over 2nd option in Graphics or Volume then leaving and going back into it has 1 frame where the cursor is on the
+2nd option, super low priority but subtly annoying (b2)
+Pressing down on a 1 or 2 option grid moves the cursor into nothing but has wraparound and acts like its a 2x2 grid instead of 1x1 or 1x2 (b3)
+
+Lots of drawing menu designs on a piece of paper to code in and bug fixes with the menu, menu is solid now
+I liked that I did actual designing and implemented things I learned in school,going to try to do that more and maybe get some
+ML/AI in there eventually since that's what my focus area was in college for my CSE major and Math minor
+Also thinking of caching cursor positions to possibly fix b0 and use caching

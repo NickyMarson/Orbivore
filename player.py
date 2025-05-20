@@ -26,10 +26,6 @@ class Player:
             self.vx *= scale # Account for diaginal movement speed > single direction movement
             self.vy *= scale
 
-
-        #self.vx = max(-self.max_speed, min(self.vx, self.max_speed)) # Clamp velocity to +/- max_speed
-        #self.vy = max(-self.max_speed, min(self.vy, self.max_speed))
-
         self.x += self.vx # Move player by velocity
         self.y += self.vy
 
