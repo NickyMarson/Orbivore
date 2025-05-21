@@ -1,8 +1,8 @@
 Active Bugs:
-b2-el, b3-lm
+b2-el
 
 Squashed Bugs:
-b0-m, b1-mh
+b0-m, b1-mh, b3-lm
 
 -el = Extremely Low Priority, -l = Low Priority, -lm = Low/Medium Priority, -m = Medium Priority, -mh = Medium/High Priority,
 -h = High Priority, -c = Critical/Game Breaking
@@ -48,3 +48,8 @@ Lots of drawing menu designs on a piece of paper to code in and bug fixes with t
 I liked that I did actual designing and implemented things I learned in school,going to try to do that more and maybe get some
 ML/AI in there eventually since that's what my focus area was in college for my CSE major and Math minor
 Also thinking of caching cursor positions to possibly fix b0 and use caching
+
+5/20/2025
+- b3 isn't actually a bug, I just gave the wrong array for the row calculation based on the array length
+- Added a Game Mode selection screen
+- Added ability to implement either vertical or horizontal lists with 1 column or 1 row
