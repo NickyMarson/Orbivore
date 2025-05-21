@@ -53,3 +53,7 @@ Also thinking of caching cursor positions to possibly fix b0 and use caching
 - b3 isn't actually a bug, I just gave the wrong array for the row calculation based on the array length
 - Added a Game Mode selection screen
 - Added ability to implement either vertical or horizontal lists with 1 column or 1 row
+
+5/21/2025
+- Rescaled balls to be 16x16
+- Created L/R arrow sprites and added them to the Start menu

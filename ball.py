@@ -3,7 +3,7 @@ import random
 from constants import player_color
 
 class Ball:
-    def __init__(self, radius=5, color=8):
+    def __init__(self, radius=8, color=8):
         self.radius = radius
         self.x = random.uniform(radius, pyxel.width - 1 - radius)
         self.y = -radius

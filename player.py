@@ -12,7 +12,7 @@ class Player:
         self.accel = 0.4 # Acceleration
         self.max_speed = 4 # Maximum speed possible
         self.friction = 0.95 # Friction coefficient
-        self.radius = 5 # Player radius
+        self.radius = 8 # Player radius
 
     def update(self):
         ax, ay = get_acceleration_input()

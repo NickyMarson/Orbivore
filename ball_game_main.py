@@ -49,6 +49,23 @@ def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y
             pyxel.rectb(rect_x, y - 3, fixed_rect_width, rect_height, 5) # Darker border around option
             pyxel.text(text_x, y, option, color_unselected_text) # Unselected option
 
+def drawArrowSprites(options, selected_index, y_start, spacing_x, color_key):
+    cols = len(options)
+    max_option_len = max(len(opt) for opt in options)
+    fixed_rect_width = max_option_len * 4 + 10  # Same as in drawOptionList()
+    total_col_width = fixed_rect_width + spacing_x
+    total_width = total_col_width * cols - spacing_x
+    base_x = (pyxel.width - total_width) // 2
+
+    # Calculate x/y for selected option
+    col = selected_index % cols
+    rect_x = base_x + col * total_col_width
+    y = y_start  # Horizontal list is a single row
+
+    # Adjust Y as needed to center with text
+    pyxel.blt(rect_x + fixed_rect_width + 2, y - 5, 0, 0, 0, 16, 16, color_key)  # -> (0, 0) to (15, 15)
+    pyxel.blt(rect_x - 18, y - 5, 0, 16, 0, 16, 16, color_key)  # <- (16, 0) to (31, 15)
+
 # Handles scrolling on menus (vertical list)
 def handleVerticalList(key_up, key_down, selected_index, options_length):
     if pyxel.btnp(key_down):
@@ -176,6 +193,8 @@ class App:
         self.last_fps_time = pyxel.frame_count # Track FPS
         self.fps = 0
 
+        pyxel.load("sprite_sheet.pyxres")
+
         self.startMenu()
 
         pyxel.run(self.update, self.draw) # Starts game loop, call update on self, then call draw on self at 30 FPS
@@ -217,7 +236,7 @@ class App:
 
         # If spawn timer reached 60 frames and spawn cap not reached
         if self.menu_spawn_timer >= self.menu_spawn_interval and len(self.menu_balls) < self.menu_spawn_cap:
-            self.menu_balls.append(Ball(radius=5, color=8)) # Create a Ball instance and add it to the Ball array
+            self.menu_balls.append(Ball(8, 8)) # Create a Ball instance and add it to the Ball array
             self.menu_spawn_timer = 0 # Reset spawn timer
 
         for ball in self.menu_balls:
@@ -315,7 +334,7 @@ class App:
 
         # If spawn timer reached 60 frames and spawn cap not reached
         if self.spawn_timer >= self.spawn_interval and len(self.balls) < self.spawn_cap:
-            self.balls.append(Ball(radius=5, color=8)) # Create a Ball instance and add it to the Ball array
+            self.balls.append(Ball(8, 8)) # Create a Ball instance and add it to the Ball array
             self.spawn_timer = 0 # Reset spawn timer
 
         alive = [] # Array of balls that are alive
@@ -362,8 +381,9 @@ class App:
         pyxel.text(centerTextHorizontal("Start"), 50, "Start", 7)
 
         drawOptionList("Start", self.start_options, self.selected_start, 100, 50, 20, 6, 0, 7, "horizontal")
+        drawArrowSprites(self.start_options, self.selected_start, 100, 50, 0)
 
-        start_instruction = "Use arrow keys to move between options, ENTER to confirm"
+        start_instruction = "Press M to return to Menu"
         pyxel.text(centerTextHorizontal(start_instruction), 180, start_instruction, 5) # Menu instructions
     
     def drawLeaderboards(self):
