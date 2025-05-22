@@ -57,3 +57,5 @@ Also thinking of caching cursor positions to possibly fix b0 and use caching
 5/21/2025
 - Rescaled balls to be 16x16
 - Created L/R arrow sprites and added them to the Start menu
+- Menus now vertically center based on number of rows in a menu
+- Created back arrow and M button sprites and added them to every menu

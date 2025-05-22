@@ -5,4 +5,4 @@ Sprite Editor:
 pyxel edit sprite_sheet.pyxres
 3 256x256-sized image banks (48 16x16 sprites)
 8 256x256-sized tilemaps
-pyxel,blt(x_screen, y_screen, img_bank_i, img_bank_start_x, img_bank_start_y, img_width, img_height, transparnt_color)
+pyxel,blt(x_screen, y_screen, img_bank_i, img_bank_start_x, img_bank_start_y, img_width, img_height, transparent_color)

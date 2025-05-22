@@ -20,12 +20,16 @@ def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y
         rows = (len(options) + cols - 1) // cols # Dynamically get num rows
 
     max_option_len = max(len(opt) for opt in options)
-    fixed_rect_width = max_option_len * 4 + 10  # 4px per character + 10px padding
+    fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
     rect_height = 12
 
     total_col_width = fixed_rect_width + spacing_x # Add spacing_x to the distance between columns to avoid overlapping rectangles
     total_width = total_col_width * cols - spacing_x  # Avoid extra gap at end
     base_x = (pyxel.width - total_width) // 2
+
+    total_height = (rows - 1) * spacing_y # Total vertical space between rows
+    adjusted_y_start = y_start - total_height // 2
+
 
     for i, option in enumerate(options): # Enumerate over the options array and draw all options dynamically in a grid pattern
         row = i // cols # Get current row
@@ -36,7 +40,7 @@ def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y
         else: # X position spacing between columns
             rect_x = base_x + col * total_col_width
 
-        y = y_start + row * spacing_y # Y position spacing between rows
+        y = adjusted_y_start + row * spacing_y # Y position spacing between rows
 
         text_offset_x = (fixed_rect_width - len(option) * 4) // 2 # Adjust x to center text inside the fixed-width rect
         text_x = rect_x + text_offset_x
@@ -52,7 +56,7 @@ def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y
 def drawArrowSprites(options, selected_index, y_start, spacing_x, color_key):
     cols = len(options)
     max_option_len = max(len(opt) for opt in options)
-    fixed_rect_width = max_option_len * 4 + 10  # Same as in drawOptionList()
+    fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
     total_col_width = fixed_rect_width + spacing_x
     total_width = total_col_width * cols - spacing_x
     base_x = (pyxel.width - total_width) // 2
@@ -65,6 +69,53 @@ def drawArrowSprites(options, selected_index, y_start, spacing_x, color_key):
     # Adjust Y as needed to center with text
     pyxel.blt(rect_x + fixed_rect_width + 2, y - 5, 0, 0, 0, 16, 16, color_key)  # -> (0, 0) to (15, 15)
     pyxel.blt(rect_x - 18, y - 5, 0, 16, 0, 16, 16, color_key)  # <- (16, 0) to (31, 15)
+
+def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg, color_selected_text, color_unselected_text):
+    max_option_len = max(len(opt) for opt in options)
+    fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
+    rect_height = 12
+    center_x = pyxel.width // 2 - fixed_rect_width // 2 # Center X for center option
+
+    # Wrap index circularly
+    def wrap_index(idx):
+        return idx % len(options)
+
+    # Indices of left, center, right options
+    left_idx = wrap_index(selected_index - 1)
+    center_idx = selected_index
+    right_idx = wrap_index(selected_index + 1)
+
+    # Positions for options: left, center, right
+    positions = [
+        center_x - (fixed_rect_width + spacing_x),
+        center_x,
+        center_x + (fixed_rect_width + spacing_x)
+    ]
+
+    option_indices = [left_idx, center_idx, right_idx]
+
+    for pos_x, opt_idx in zip(positions, option_indices):
+        option = options[opt_idx]
+        y = y_start
+
+        # Center text inside rect
+        text_offset_x = (fixed_rect_width - len(option) * 4) // 2
+        text_x = pos_x + text_offset_x
+
+        # Draw rect and text
+        if opt_idx == selected_index:
+            pyxel.rectb(pos_x, y - 3, fixed_rect_width, rect_height, 5)
+            pyxel.rect(pos_x, y - 3, fixed_rect_width, rect_height, color_selected_bg)
+            pyxel.text(text_x, y, option, color_selected_text)
+        else:
+            pyxel.rectb(pos_x, y - 3, fixed_rect_width, rect_height, 5)
+            pyxel.text(text_x, y, option, color_unselected_text)
+
+    # Draw arrows
+    arrow_y = y_start - 5
+    margin = 32 # Changes x distance from screen edge to option
+    pyxel.blt(positions[2] + fixed_rect_width + margin, arrow_y, 0, 0, 0, 16, 16, 0) # -> between right screen edge and right option
+    pyxel.blt(positions[0] - 16 - margin, arrow_y, 0, 16, 0, 16, 16, 0) # <- between left screen edge and left option
 
 # Handles scrolling on menus (vertical list)
 def handleVerticalList(key_up, key_down, selected_index, options_length):
@@ -350,7 +401,6 @@ class App:
 
     def draw(self): # Draws whichever state is currently active
         pyxel.cls(0) # Clears screen with color 0 = black
-        pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
 
         # Check which state is active and draw it
         if self.current_state == "menu":
@@ -367,65 +417,50 @@ class App:
             self.drawGraphics()
         elif self.current_state == "volume":
             self.drawVolume()
+        
+        self.globalDraw()
+
+    def globalDraw(self): # Draws everything that should (almost) always be on screen
+        if self.current_state != "game":
+            pyxel.blt(4, 4, 2, 0, 0, 16, 19, 0) # Back arrow
+            pyxel.blt(20, 2, 1, 0, 0, 11, 11, 0) # M for back arrow key instructions
+        pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
 
     def drawMenu(self): # Draws menu
         for ball in self.menu_balls:
             ball.draw()
 
-        drawOptionList("Orbivore", self.menu_options, self.selected_menu, 100, 50, 20, 6, 0, 7, "grid")
-
+        drawOptionList("Orbivore", self.menu_options, self.selected_menu, 128, 24, 24, 6, 0, 7, "grid")
         menu_instruction = "Use arrow keys to move between options, ENTER to confirm"
         pyxel.text(centerTextHorizontal(menu_instruction), 180, menu_instruction, 5) # Menu instructions
 
     def drawStart(self):
         pyxel.text(centerTextHorizontal("Start"), 50, "Start", 7)
-
-        drawOptionList("Start", self.start_options, self.selected_start, 100, 50, 20, 6, 0, 7, "horizontal")
-        drawArrowSprites(self.start_options, self.selected_start, 100, 50, 0)
-
-        start_instruction = "Press M to return to Menu"
-        pyxel.text(centerTextHorizontal(start_instruction), 180, start_instruction, 5) # Menu instructions
+        drawCarousel(self.start_options, self.selected_start, 128, 24, 6, 0, 7)
     
     def drawLeaderboards(self):
         pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 7)
-
         self.selected_leaderboard = getattr(self, "selected_leaderboard", 0)  # Initialize if not set
-
-        drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, 100, 50, 20, 6, 0, 7, "grid")
-
-        leaderboard_instruction = "Press M to return to Menu"
-        pyxel.text(centerTextHorizontal(leaderboard_instruction), 200, leaderboard_instruction, 5)
+        drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, 128, 24, 24, 6, 0, 7, "grid")
 
     def drawSettings(self):
         pyxel.text(centerTextHorizontal("Settings"), 50, "Settings", 7)
-
-        drawOptionList("Settings", self.setting_options, self.selected_settings, 100, 50, 20, 6, 0, 7, "grid")
-
-        settings_instruction = "Press M to return to Menu"
-        pyxel.text(centerTextHorizontal(settings_instruction), 200, settings_instruction, 5)
+        drawOptionList("Settings", self.setting_options, self.selected_settings, 128, 24, 24, 6, 0, 7, "grid")
 
     def drawGraphics(self):
         pyxel.text(centerTextHorizontal("Graphics"), 50, "Graphics", 7)
-
-        drawOptionList("Graphics", self.graphics_options, self.selected_graphics, 100, 50, 20, 6, 0, 7, "grid")
-
-        graphics_instruction = "Press M to return to Settings"
-        pyxel.text(centerTextHorizontal(graphics_instruction), 200, graphics_instruction, 5)
+        drawOptionList("Graphics", self.graphics_options, self.selected_graphics, 128, 24, 24, 6, 0, 7, "grid")
 
     def drawVolume(self):
         pyxel.text(centerTextHorizontal("Volume"), 50, "Volume", 7)
-
-        drawOptionList("Volume", self.volume_options, self.selected_volume, 100, 50, 20, 6, 0, 7, "grid")
-
-        volume_instruction = "Press M to return to Settings"
-        pyxel.text(centerTextHorizontal(volume_instruction), 200, volume_instruction, 5)
+        drawOptionList("Volume", self.volume_options, self.selected_volume, 128, 24, 24, 6, 0, 7, "grid")
 
     def drawGame(self): # Draws game
         self.player.draw() # Draw player
         for ball in self.balls: # Draw balls
             ball.draw()
 
-        pyxel.text(5, 5, f"Score: {self.score}", 7) # Draw text (X, Y, String, Text Color)
+        pyxel.text(5, 5, f"Score: {self.score}", 7) # Draw game score (X, Y, String, Text Color)
 
     # --------------------OTHER APP FUNCTIONS--------------------
 
