@@ -9,8 +9,9 @@ class Ball:
         self.y = -radius
         self.vx = random.uniform(-1, 1) # Generate random velocity between a and b
         self.vy = 0
-        
         self.gravity = random.uniform(0.2, 1) # Gravity to make balls fall
+
+        self.top_boundary = False # Bool for opening and closing top of screen boundary
 
         excluded_colors = {0, 7, player_color} # Background, Text, Player Colors
         available_colors = [c for c in range(16) if c not in excluded_colors]
@@ -25,6 +26,7 @@ class Ball:
         max_x = pyxel.width - 1 - self.radius # Max/Min values to set wall boundaries
         min_x = self.radius
         max_y = pyxel.height - 1 - self.radius
+        min_y = self.radius
 
         # Bouncy walls mechanic (Left/Right)
         if self.x < min_x: # If past the left x-boundary
@@ -38,6 +40,12 @@ class Ball:
         if self.y > max_y: # If past the bottom y-boundary
             self.y = max_y
             self.vy = -self.vy
+
+        # Bouncy walls mechanic (Only top)
+        if self.top_boundary == True:
+            if self.y < min_y: # If past the top y-boundary
+                self.y = min_y
+                self.vy = -self.vy
 
     def draw(self):
         pyxel.circ(int(self.x), int(self.y), self.radius, self.color)

@@ -1,4 +1,5 @@
 import pyxel
+import random
 
 from import_classes.player import Player
 from import_classes.ball import Ball
@@ -93,6 +94,19 @@ class App:
             self.menu_balls.append(Ball(8, 8)) # Create a Ball instance and add it to the Ball array
             self.menu_spawn_timer = 0 # Reset spawn timer
 
+        if pyxel.btnp(pyxel.KEY_EQUALS): # Cheat button >:(
+            if len(self.menu_balls) == self.menu_spawn_cap: # Spawn cap hit so just give a bunch of speed to the balls
+                for ball in self.menu_balls:
+                    ball.top_boundary = True
+                    if ball.vy < 0:
+                        ball.vy -= 0.1
+                    elif ball.vy > 0:
+                        ball.vy += 0.1
+
+            while len(self.menu_balls) < self.menu_spawn_cap: # Spawns balls until spawn cap is hit
+                self.menu_balls.append(Ball(8, 8))
+                self.menu_spawn_timer = 0
+
         for ball in self.menu_balls:
             ball.update()
 
@@ -181,6 +195,11 @@ class App:
             self.exit_state()
             self.clearGame() # Clear game objects to free memory
             return
+        
+        if pyxel.btnp(pyxel.KEY_EQUALS): # Cheat button >:(   (spawns balls until spawn cap is hit)
+            while len(self.balls) < self.spawn_cap:
+                self.balls.append(Ball(8, 8))
+                self.spawn_timer = 0
 
         self.player.update() # Update player
 
