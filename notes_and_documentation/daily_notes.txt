@@ -63,3 +63,5 @@ Also thinking of caching cursor positions to possibly fix b0 and use caching
 5/25/2025
 - Back arrow now only displays if there has been a button press in the last 5 seconds, and never on main menu or game screens
 - Moved functions into packages to clean up main and reorganize everything else
+- Pressing = on the menu screen spawns balls until the spawn cap is reached, pressing it again adds 0.1 to the ball's current velocity,
+also adds a ceiling when the spawn cap is hit on the menu so the balls can bounce super fast
