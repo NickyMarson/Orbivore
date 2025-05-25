@@ -62,3 +62,4 @@ Also thinking of caching cursor positions to possibly fix b0 and use caching
 
 5/25/2025
 - Back arrow now only displays if there has been a button press in the last 5 seconds, and never on main menu or game screens
+- Moved functions into packages to clean up main and reorganize everything else

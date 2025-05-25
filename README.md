@@ -7,7 +7,7 @@ I plan to keep adding stuff when I feel like it an have free time. I have a dece
 Here is my LinkedIn: www.linkedin.com/in/nicky-marson
 
 # Documentation and Progress
-![](./drawing_file.drawio.svg)
+![](notes_and_documentation/drawing_file.drawio.svg)
 
 # HITS Counter
 ![Badge](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2FNickyMarson%2FOrbivore&label=Visitors&icon=github&color=%23198754)

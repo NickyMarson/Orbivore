@@ -1,6 +1,6 @@
 import pyxel
 import random
-from constants import player_color
+from import_variables.constants import player_color
 
 class Ball:
     def __init__(self, radius=8, color=8):

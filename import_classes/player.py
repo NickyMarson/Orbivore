@@ -1,6 +1,6 @@
 import pyxel
-from movement import get_acceleration_input
-from constants import player_color
+from import_variables.movement import get_acceleration_input
+from import_variables.constants import player_color
 
 class Player:
     def __init__(self, x, y):

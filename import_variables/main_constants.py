@@ -1,6 +1,6 @@
+# Variables only used in main
 import pyxel
 
-# Variables only used in main
 other_keys = [
     pyxel.KEY_LEFT,
     pyxel.KEY_RIGHT,
