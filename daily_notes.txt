@@ -59,3 +59,6 @@ Also thinking of caching cursor positions to possibly fix b0 and use caching
 - Created L/R arrow sprites and added them to the Start menu
 - Menus now vertically center based on number of rows in a menu
 - Created back arrow and M button sprites and added them to every menu
+
+5/25/2025
+- Back arrow now only displays if there has been a button press in the last 5 seconds, and never on main menu or game screens

@@ -1,6 +1,7 @@
 import pyxel
 from player import Player
 from ball import Ball
+from main_constants import other_keys
 
 # --------------------GLOBAL FUNCTIONS--------------------
 
@@ -209,6 +210,16 @@ def handleGridSelection(key_up, key_down, key_left, key_right, selected_index, o
 
     return selected_index, prev_col
 
+def any_key_pressed(): # Checks for any keyboard input
+    for key in other_keys:
+        if pyxel.btnp(key):
+            return True
+
+    for key in range(256):
+        if pyxel.btnp(key):
+            return True
+    return False
+
 # --------------------APP CLASS--------------------
 
 class App:
@@ -243,6 +254,7 @@ class App:
 
         self.last_fps_time = pyxel.frame_count # Track FPS
         self.fps = 0
+        self.last_input_frame = None
 
         pyxel.load("sprite_sheet.pyxres")
 
@@ -275,6 +287,11 @@ class App:
         if pyxel.frame_count - self.last_fps_time >= 30:
             self.fps = 30 # Pyxel runs at a fixed 30 FPS
             self.last_fps_time = pyxel.frame_count # Count number of frames to get FPS
+
+        if self.current_state != "menu" and self.current_state != "game":
+            if any_key_pressed(): # Check if a key pressed this frame
+                self.last_input_frame = pyxel.frame_count
+
 
     def updateMenu(self): # Update menu state
         new_index, new_prev_col = self.changeCursorPosition(len(self.menu_options), 2, self.current_state, self.current_state, "grid")
@@ -421,9 +438,16 @@ class App:
         self.globalDraw()
 
     def globalDraw(self): # Draws everything that should (almost) always be on screen
-        if self.current_state != "game":
+        show_back_arrow = False
+        # Checks if last button press was within the last 5 seconds, if so then display back arrow
+        if self.last_input_frame is not None:
+            if pyxel.frame_count - self.last_input_frame < 150:
+                show_back_arrow = True
+
+        if self.current_state != "menu" and self.current_state != "game" and show_back_arrow: # Display back arrow
             pyxel.blt(4, 4, 2, 0, 0, 16, 19, 0) # Back arrow
             pyxel.blt(20, 2, 1, 0, 0, 11, 11, 0) # M for back arrow key instructions
+
         pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
 
     def drawMenu(self): # Draws menu
