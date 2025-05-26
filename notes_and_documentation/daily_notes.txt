@@ -60,8 +60,12 @@ Also thinking of caching cursor positions to possibly fix b0 and use caching
 - Menus now vertically center based on number of rows in a menu
 - Created back arrow and M button sprites and added them to every menu
 
-5/25/2025
+5/24/2025
 - Back arrow now only displays if there has been a button press in the last 5 seconds, and never on main menu or game screens
 - Moved functions into packages to clean up main and reorganize everything else
 - Pressing = on the menu screen spawns balls until the spawn cap is reached, pressing it again adds 0.1 to the ball's current velocity,
 also adds a ceiling when the spawn cap is hit on the menu so the balls can bounce super fast
+
+5/25/2025
+- Separated the calculation logic of a menu's grid of options from the drawing of the options
+- Previous change led to calculating all menu grids 1 time in __init__() instead of 1 time every frame

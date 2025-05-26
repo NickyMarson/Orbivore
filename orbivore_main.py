@@ -3,7 +3,7 @@ import random
 
 from import_classes.player import Player
 from import_classes.ball import Ball
-from import_functions.list_utils import drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
+from import_functions.list_utils import computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
 from import_functions.draw_utils import drawArrowSprites, drawCarousel
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
 
@@ -13,35 +13,7 @@ class App:
     def __init__(self): # Constructor for the App class
         pyxel.init(256, 256, title="Salutations Huzz", quit_key=pyxel.KEY_ESCAPE) # Initialize window (Width, Height, Quit Key)
 
-        self.current_state = "menu" # Start on menu
-        self.state_stack = [] # Tracks state path like ['menu', 'settings']
-        self.cursor_map = {"menu": 0} # Tracks selected_option per state, start on menu at position 0
-        self.prev_col_map = {} # Tracks previous column
-
-        self.menu_options = ["Start", "Leaderboards", "Settings"]
-        self.start_options = ["Gurt", "Yo", "Ts"]
-        self.leaderboard_options = ["Gurt: Yo", "Yo: Gurt", "Rt: Ts is option 3", "3: WHAAAAAT"]
-        self.setting_options = ["Controls", "Volume", "Graphics", "Aspect Ratio", "Windowed or Borderless", "FPS Display"]
-        self.graphics_options = ["Main Menu Balls", "Colorblind Mode"]
-        self.volume_options = ["Master Volume", "Other Volume (TBD)"]
-
-        self.selected_menu = 0 # Set current main menu selected option to 0 (top left)
-        self.selected_start = 1
-        self.selected_leaderboard = 0
-        self.selected_settings = 0
-        self.selected_graphics = 0
-        self.selected_volume = 0
-
-        self.prev_col_menu = 0 # Set last main menu selected column to 0 (top left)
-        self.prev_col_start = 0
-        self.prev_col_leaderboard = 0
-        self.prev_col_settings = 0
-        self.prev_col_graphics = 0
-        self.prev_col_volume = 0
-
-        self.last_fps_time = pyxel.frame_count # Track FPS
-        self.fps = 0
-        self.last_input_frame = None
+        self.initializeInstanceVars() # Initialize all instance variables
 
         pyxel.load("sprite_sheet.pyxres")
 
@@ -259,7 +231,7 @@ class App:
         for ball in self.menu_balls:
             ball.draw()
 
-        drawOptionList("Orbivore", self.menu_options, self.selected_menu, 128, 24, 24, 6, 0, 7, "grid")
+        drawOptionList("Orbivore", self.menu_options, self.selected_menu, self.menu_layout, 6, 0, 7) # Draw the grid
         menu_instruction = "Use arrow keys to move between options"
         menu_instruction_2 = "ENTER to confirm, Q to quit game"
         pyxel.text(centerTextHorizontal(menu_instruction), 180, menu_instruction, 5) # Menu instructions
@@ -272,19 +244,19 @@ class App:
     def drawLeaderboards(self):
         pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 7)
         self.selected_leaderboard = getattr(self, "selected_leaderboard", 0)  # Initialize if not set
-        drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, 128, 24, 24, 6, 0, 7, "grid")
+        drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, self.leaderboard_layout, 6, 0, 7)
 
     def drawSettings(self):
         pyxel.text(centerTextHorizontal("Settings"), 50, "Settings", 7)
-        drawOptionList("Settings", self.setting_options, self.selected_settings, 128, 24, 24, 6, 0, 7, "grid")
+        drawOptionList("Settings", self.setting_options, self.selected_settings, self.settings_layout, 6, 0, 7)
 
     def drawGraphics(self):
         pyxel.text(centerTextHorizontal("Graphics"), 50, "Graphics", 7)
-        drawOptionList("Graphics", self.graphics_options, self.selected_graphics, 128, 24, 24, 6, 0, 7, "grid")
+        drawOptionList("Graphics", self.graphics_options, self.selected_graphics, self.graphics_layout, 6, 0, 7)
 
     def drawVolume(self):
         pyxel.text(centerTextHorizontal("Volume"), 50, "Volume", 7)
-        drawOptionList("Volume", self.volume_options, self.selected_volume, 128, 24, 24, 6, 0, 7, "grid")
+        drawOptionList("Volume", self.volume_options, self.selected_volume, self.volume_layout, 6, 0, 7)
 
     def drawGame(self): # Draws game
         self.player.draw() # Draw player
@@ -353,6 +325,43 @@ class App:
             self.current_state = self.state_stack.pop() # Pop previous state from stack and switch back
             self.selected_option = self.cursor_map.get(self.current_state, 0) # Get default cursor position for previous state or default to 0
             self.prev_col = self.prev_col_map.get(self.current_state, 0) # Get default column index for previous state or default to 0
+
+    def initializeInstanceVars(self): # Initializes instance variables, just makes __init__() easier to read
+        self.current_state = "menu" # Start on menu
+        self.state_stack = [] # Tracks state path like ['menu', 'settings']
+        self.cursor_map = {"menu": 0} # Tracks selected_option per state, start on menu at position 0
+        self.prev_col_map = {} # Tracks previous column
+
+        self.menu_options = ["Start", "Leaderboards", "Settings"]
+        self.start_options = ["Gurt", "Yo", "Ts"]
+        self.leaderboard_options = ["Gurt: Yo", "Yo: Gurt", "Rt: Ts is option 3", "3: WHAAAAAT"]
+        self.setting_options = ["Controls", "Volume", "Graphics", "Aspect Ratio", "Windowed or Borderless", "FPS Display"]
+        self.graphics_options = ["Main Menu Balls", "Colorblind Mode"]
+        self.volume_options = ["Master Volume", "Other Volume (TBD)"]
+
+        self.selected_menu = 0 # Set current main menu selected option to 0 (top left)
+        self.selected_start = 1
+        self.selected_leaderboard = 0
+        self.selected_settings = 0
+        self.selected_graphics = 0
+        self.selected_volume = 0
+
+        self.prev_col_menu = 0 # Set last main menu selected column to 0 (top left)
+        self.prev_col_start = 0
+        self.prev_col_leaderboard = 0
+        self.prev_col_settings = 0
+        self.prev_col_graphics = 0
+        self.prev_col_volume = 0
+
+        self.menu_layout = computeListLayout(self.menu_options, 128, 24, 24, "grid") # Calculate positions of options in a grid layout
+        self.leaderboard_layout = computeListLayout(self.leaderboard_options, 128, 24, 24, "grid")
+        self.settings_layout = computeListLayout(self.setting_options, 128, 24, 24, "grid")
+        self.graphics_layout = computeListLayout(self.graphics_options, 128, 24, 24, "grid")
+        self.volume_layout = computeListLayout(self.volume_options, 128, 24, 24, "grid")
+
+        self.last_fps_time = pyxel.frame_count # Track FPS
+        self.fps = 0
+        self.last_input_frame = None
 
 
 App() # Creates an instance of the App class, calls constructor and runs game

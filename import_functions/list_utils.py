@@ -2,15 +2,13 @@
 import pyxel
 from .other_utils import centerTextHorizontal
 
-# Draws all options from the input parameters
-def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y, color_selected_bg, color_selected_text, color_unselected_text, mode):
-    pyxel.text(centerTextHorizontal(title), 50, title, 14)
-
+# Calculates the grid layout for other functions to use
+def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
     if mode == "horizontal":
         cols = len(options)
         rows = 1
     elif mode == "grid":
-        cols = 2 # Num columns
+        cols = 2
         rows = (len(options) + cols - 1) // cols # Dynamically get num rows
 
     max_option_len = max(len(opt) for opt in options)
@@ -18,19 +16,21 @@ def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y
     rect_height = 12
 
     total_col_width = fixed_rect_width + spacing_x # Add spacing_x to the distance between columns to avoid overlapping rectangles
-    total_width = total_col_width * cols - spacing_x  # Avoid extra gap at end
+    total_width = total_col_width * cols - spacing_x # Avoid extra gap at end
     base_x = (pyxel.width - total_width) // 2
 
     total_height = (rows - 1) * spacing_y # Total vertical space between rows
     adjusted_y_start = y_start - total_height // 2
 
+    layout = {}
 
-    for i, option in enumerate(options): # Enumerate over the options array and draw all options dynamically in a grid pattern
+    for i, option in enumerate(options): # Enumerate over the options list and save layout info per option in a dict of dicts
         row = i // cols # Get current row
         col = i % cols # Get current column
 
-        if mode == "grid" and row == rows - 1 and len(options) % 2 == 1 and col == 0: # Check if current option is last row and only 1 option in row
-            rect_x = (pyxel.width - fixed_rect_width) // 2 # If so then center it instead of making it in the grid pattern
+        # Check if current option is last row and only 1 option in row
+        if mode == "grid" and row == rows - 1 and len(options) % 2 == 1 and col == 0:
+            rect_x = (pyxel.width - fixed_rect_width) // 2 # Center single option instead of making it in the grid pattern
         else: # X position spacing between columns
             rect_x = base_x + col * total_col_width
 
@@ -39,12 +39,37 @@ def drawOptionList(title, options, selected_index, y_start, spacing_x, spacing_y
         text_offset_x = (fixed_rect_width - len(option) * 4) // 2 # Adjust x to center text inside the fixed-width rect
         text_x = rect_x + text_offset_x
 
+        # Dict for all layout info for this option, appended to the layout dict
+        layout[option] = {
+            "index": i, # Accessed by layout["option_name"]["index"]
+            "rect_x": rect_x,
+            "rect_y": y,
+            "width": fixed_rect_width,
+            "height": rect_height,
+            "text_x": text_x
+        }
+
+    return layout
+
+# Draws all options from the input parameters
+def drawOptionList(title, options, selected_index, layout, color_selected_bg, color_selected_text, color_unselected_text):
+    pyxel.text(centerTextHorizontal(title), 50, title, 14)
+
+    for option in options: # Loop over each option in the list, get its data, then draw the option using that data
+        opt_data = layout[option]
+        i = opt_data["index"]
+        x = opt_data["rect_x"]
+        y = opt_data["rect_y"]
+        w = opt_data["width"]
+        h = opt_data["height"]
+        text_x = opt_data["text_x"]
+
+        pyxel.rectb(x, y - 3, w, h, 5) # Darker border around option
+
         if i == selected_index:
-            pyxel.rectb(rect_x, y - 3, fixed_rect_width, rect_height, 5) # Darker border around option
-            pyxel.rect(rect_x, y - 3, fixed_rect_width, rect_height, color_selected_bg) # Highlighted background
+            pyxel.rect(x, y - 3, w, h, color_selected_bg) # Highlighted background
             pyxel.text(text_x, y, option, color_selected_text) # Selected option text
         else:
-            pyxel.rectb(rect_x, y - 3, fixed_rect_width, rect_height, 5) # Darker border around option
             pyxel.text(text_x, y, option, color_unselected_text) # Unselected option
 
 # Handles scrolling on menus (vertical list)
