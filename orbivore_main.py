@@ -4,7 +4,7 @@ import random
 from import_classes.player import Player
 from import_classes.ball import Ball
 from import_functions.list_utils import computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
-from import_functions.draw_utils import drawArrowSprites, drawCarousel
+from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
 
 # --------------------APP CLASS--------------------
@@ -138,6 +138,11 @@ class App:
                 self.enter_state("graphics") # Change state to graphics
             elif selected_option == "Volume":
                 self.enter_state("volume") # Change state to volume
+            elif selected_option == "FPS Display": # Toggle FPS Display
+                if self.settings["FPS Display"] == True:
+                    self.settings["FPS Display"] = False
+                else:
+                    self.settings["FPS Display"] = True
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
             self.exit_state()
@@ -225,7 +230,8 @@ class App:
             pyxel.blt(4, 4, 2, 0, 0, 16, 19, 0) # Back arrow
             pyxel.blt(20, 2, 1, 0, 0, 11, 11, 0) # M for back arrow key instructions
 
-        pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
+        if self.settings["FPS Display"] == True:
+            pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
 
     def drawMenu(self): # Draws menu
         for ball in self.menu_balls:
@@ -249,6 +255,7 @@ class App:
     def drawSettings(self):
         pyxel.text(centerTextHorizontal("Settings"), 50, "Settings", 7)
         drawOptionList("Settings", self.setting_options, self.selected_settings, self.settings_layout, 6, 0, 7)
+        drawSmallArrow("FPS Display", self.settings_layout, self.settings["FPS Display"]) # Draws < or > arrow inside FPS Display option
 
     def drawGraphics(self):
         pyxel.text(centerTextHorizontal("Graphics"), 50, "Graphics", 7)
@@ -358,6 +365,11 @@ class App:
         self.settings_layout = computeListLayout(self.setting_options, 128, 24, 24, "grid")
         self.graphics_layout = computeListLayout(self.graphics_options, 128, 24, 24, "grid")
         self.volume_layout = computeListLayout(self.volume_options, 128, 24, 24, "grid")
+
+        self.settings = {
+            "Window Mode": "Windowed", # Not implemented
+            "FPS Display": True
+        }
 
         self.last_fps_time = pyxel.frame_count # Track FPS
         self.fps = 0

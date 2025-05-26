@@ -69,3 +69,4 @@ also adds a ceiling when the spawn cap is hit on the menu so the balls can bounc
 5/25/2025
 - Separated the calculation logic of a menu's grid of options from the drawing of the options
 - Previous change led to calculating all menu grids 1 time in __init__() instead of 1 time every frame
+- Added ability to toggle the FPS Display

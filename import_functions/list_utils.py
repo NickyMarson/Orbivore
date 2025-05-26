@@ -13,7 +13,7 @@ def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
 
     max_option_len = max(len(opt) for opt in options)
     fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
-    rect_height = 12
+    rect_height = 16
 
     total_col_width = fixed_rect_width + spacing_x # Add spacing_x to the distance between columns to avoid overlapping rectangles
     total_width = total_col_width * cols - spacing_x # Avoid extra gap at end
@@ -34,7 +34,8 @@ def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
         else: # X position spacing between columns
             rect_x = base_x + col * total_col_width
 
-        y = adjusted_y_start + row * spacing_y # Y position spacing between rows
+        rect_y = adjusted_y_start + row * spacing_y # Y position spacing between rows
+        text_y = rect_y + (rect_height - 8) // 2 + 1
 
         text_offset_x = (fixed_rect_width - len(option) * 4) // 2 # Adjust x to center text inside the fixed-width rect
         text_x = rect_x + text_offset_x
@@ -43,10 +44,11 @@ def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
         layout[option] = {
             "index": i, # Accessed by layout["option_name"]["index"]
             "rect_x": rect_x,
-            "rect_y": y,
+            "rect_y": rect_y,
             "width": fixed_rect_width,
             "height": rect_height,
-            "text_x": text_x
+            "text_x": text_x,
+            "text_y": text_y
         }
 
     return layout
@@ -63,14 +65,15 @@ def drawOptionList(title, options, selected_index, layout, color_selected_bg, co
         w = opt_data["width"]
         h = opt_data["height"]
         text_x = opt_data["text_x"]
+        text_y = opt_data["text_y"]
 
-        pyxel.rectb(x, y - 3, w, h, 5) # Darker border around option
+        pyxel.rectb(x, y, w, h, 5) # Darker border around option
 
         if i == selected_index:
-            pyxel.rect(x, y - 3, w, h, color_selected_bg) # Highlighted background
-            pyxel.text(text_x, y, option, color_selected_text) # Selected option text
+            pyxel.rect(x, y, w, h, color_selected_bg) # Highlighted background
+            pyxel.text(text_x, text_y, option, color_selected_text) # Selected option text
         else:
-            pyxel.text(text_x, y, option, color_unselected_text) # Unselected option
+            pyxel.text(text_x, text_y, option, color_unselected_text) # Unselected option
 
 # Handles scrolling on menus (vertical list)
 def handleVerticalList(key_up, key_down, selected_index, options_length):
