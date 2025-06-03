@@ -1,4 +1,6 @@
 import pyxel
+import json
+import os
 import random
 
 from import_classes.player import Player
@@ -6,6 +8,22 @@ from import_classes.ball import Ball
 from import_functions.list_utils import computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
 from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
+
+# --------------------CONFIG FUNCTIONS--------------------
+
+def load_config(): # Loads settings from config file
+    if os.path.exists("config.json"):
+        with open("config.json", "r") as f:
+            return json.load(f)
+    else:
+        return {
+            "Window Mode": "Windowed",
+            "FPS Display": True
+        }
+    
+def save_config(settings): # Saves settings in config file
+    with open("config.json", "w") as f:
+        json.dump(settings, f, indent=4)
 
 # --------------------APP CLASS--------------------
 
@@ -139,10 +157,8 @@ class App:
             elif selected_option == "Volume":
                 self.enter_state("volume") # Change state to volume
             elif selected_option == "FPS Display": # Toggle FPS Display
-                if self.settings["FPS Display"] == True:
-                    self.settings["FPS Display"] = False
-                else:
-                    self.settings["FPS Display"] = True
+                self.settings["FPS Display"] = not self.settings["FPS Display"]
+                save_config(self.settings) # Save setting to config file
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
             self.exit_state()
@@ -366,10 +382,7 @@ class App:
         self.graphics_layout = computeListLayout(self.graphics_options, 128, 24, 24, "grid")
         self.volume_layout = computeListLayout(self.volume_options, 128, 24, 24, "grid")
 
-        self.settings = {
-            "Window Mode": "Windowed", # Not implemented
-            "FPS Display": True
-        }
+        self.settings = load_config() # Load the saved settings from the config file
 
         self.last_fps_time = pyxel.frame_count # Track FPS
         self.fps = 0
