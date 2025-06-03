@@ -2,8 +2,17 @@
 import pyxel
 from .other_utils import centerTextHorizontal
 
+def buildSettingLabels(setting_options, settings): # Builds labels for the Settings menu to dynamically update
+    labels = []
+    for option in setting_options:
+        if option == "Control Mode":
+            labels.append(f"{settings.get('Control Mode', 'Keyboard')}")
+        else:
+            labels.append(option)
+    return labels
+
 # Calculates the grid layout for other functions to use
-def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
+def computeListLayout(options, y_start, spacing_x, spacing_y, mode, fix_width=None):
     if mode == "horizontal":
         cols = len(options)
         rows = 1
@@ -11,8 +20,12 @@ def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
         cols = 2
         rows = (len(options) + cols - 1) // cols # Dynamically get num rows
 
-    max_option_len = max(len(opt) for opt in options)
-    fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
+    if fix_width is not None:
+        fixed_rect_width = len(fix_width) * 4 + 10 # 4px per character + 10px padding
+    else:
+        max_option_len = max(len(opt) for opt in options)
+        fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
+
     rect_height = 16
 
     total_col_width = fixed_rect_width + spacing_x # Add spacing_x to the distance between columns to avoid overlapping rectangles
@@ -54,7 +67,7 @@ def computeListLayout(options, y_start, spacing_x, spacing_y, mode):
     return layout
 
 # Draws all options from the input parameters
-def drawOptionList(title, options, selected_index, layout, color_selected_bg, color_selected_text, color_unselected_text):
+def drawOptionList(title, options, selected_index, layout, color_selected_bg, color_selected_text, color_unselected_text, settings=None):
     pyxel.text(centerTextHorizontal(title), 50, title, 14)
 
     for option in options: # Loop over each option in the list, get its data, then draw the option using that data
@@ -67,13 +80,21 @@ def drawOptionList(title, options, selected_index, layout, color_selected_bg, co
         text_x = opt_data["text_x"]
         text_y = opt_data["text_y"]
 
+        if settings:
+            if option == "Control Mode":
+                label = f"{settings.get('Control Mode', 'Keyboard')}"
+            else:
+                label = option
+        else:
+            label = option
+
         pyxel.rectb(x, y, w, h, 5) # Darker border around option
 
         if i == selected_index:
             pyxel.rect(x, y, w, h, color_selected_bg) # Highlighted background
-            pyxel.text(text_x, text_y, option, color_selected_text) # Selected option text
+            pyxel.text(text_x, text_y, label, color_selected_text) # Selected option text
         else:
-            pyxel.text(text_x, text_y, option, color_unselected_text) # Unselected option
+            pyxel.text(text_x, text_y, label, color_unselected_text) # Unselected option
 
 # Handles scrolling on menus (vertical list)
 def handleVerticalList(key_up, key_down, selected_index, options_length):

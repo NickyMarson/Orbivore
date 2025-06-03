@@ -5,7 +5,7 @@ import random
 
 from import_classes.player import Player
 from import_classes.ball import Ball
-from import_functions.list_utils import computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
+from import_functions.list_utils import buildSettingLabels, computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
 from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
 
@@ -64,6 +64,14 @@ class App:
         if pyxel.frame_count - self.last_fps_time >= 30:
             self.fps = 30 # Pyxel runs at a fixed 30 FPS
             self.last_fps_time = pyxel.frame_count # Count number of frames to get FPS
+
+        if self.settings["Control Mode"] == "Keyboard and Mouse": # KB+M so get mouse position
+            mouse_x = pyxel.mouse_x
+            mouse_y = pyxel.mouse_y
+
+            if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT): # Check for left click
+                print(f"Mouse clicked at {mouse_x}, {mouse_y}")
+
 
         if self.current_state != "menu" and self.current_state != "game":
             if any_key_pressed(): # Check if a key pressed this frame
@@ -152,13 +160,26 @@ class App:
 
             #if selected_option == "Controls":
                 #self.enter_state("controls") # Change state to controls
+
             if selected_option == "Graphics":
                 self.enter_state("graphics") # Change state to graphics
+
             elif selected_option == "Volume":
                 self.enter_state("volume") # Change state to volume
+
             elif selected_option == "FPS Display": # Toggle FPS Display
                 self.settings["FPS Display"] = not self.settings["FPS Display"]
                 save_config(self.settings) # Save setting to config file
+
+            elif selected_option == "Control Mode": # Change Control Mode (rename later to have dynamic naming)
+                if self.settings["Control Mode"] == "Keyboard":
+                    self.settings["Control Mode"] = "Keyboard & Mouse"
+                elif self.settings["Control Mode"] == "Keyboard & Mouse":
+                    self.settings["Control Mode"] = "Keyboard"
+                save_config(self.settings) # Save setting to config file
+                self.setting_labels = buildSettingLabels(self.setting_options, self.settings)
+                self.settings_layout = computeListLayout(self.setting_labels, 128, 24, 24, "grid", self.fix_width_settings)
+            print(selected_option)
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
             self.exit_state()
@@ -235,6 +256,10 @@ class App:
         
         self.globalDraw()
 
+        if self.settings["Control Mode"] == "Keyboard & Mouse":
+            pyxel.circ(pyxel.mouse_x, pyxel.mouse_y, 2, 7) # Draw cursor
+
+
     def globalDraw(self): # Draws everything that should (almost) always be on screen
         show_back_arrow = False
         # Checks if last button press was within the last 5 seconds, if so then display back arrow
@@ -270,7 +295,7 @@ class App:
 
     def drawSettings(self):
         pyxel.text(centerTextHorizontal("Settings"), 50, "Settings", 7)
-        drawOptionList("Settings", self.setting_options, self.selected_settings, self.settings_layout, 6, 0, 7)
+        drawOptionList("Settings", self.setting_labels, self.selected_settings, self.settings_layout, 6, 0, 7, self.settings)
         drawSmallArrow("FPS Display", self.settings_layout, self.settings["FPS Display"]) # Draws < or > arrow inside FPS Display option
 
     def drawGraphics(self):
@@ -358,7 +383,7 @@ class App:
         self.menu_options = ["Start", "Leaderboards", "Settings"]
         self.start_options = ["Gurt", "Yo", "Ts"]
         self.leaderboard_options = ["Gurt: Yo", "Yo: Gurt", "Rt: Ts is option 3", "3: WHAAAAAT"]
-        self.setting_options = ["Controls", "Volume", "Graphics", "Aspect Ratio", "Windowed or Borderless", "FPS Display"]
+        self.setting_options = ["Controls", "Volume", "Graphics", "Aspect Ratio", "Control Mode", "FPS Display"]
         self.graphics_options = ["Main Menu Balls", "Colorblind Mode"]
         self.volume_options = ["Master Volume", "Other Volume (TBD)"]
 
@@ -376,13 +401,15 @@ class App:
         self.prev_col_graphics = 0
         self.prev_col_volume = 0
 
+        self.settings = load_config() # Load the saved settings from the config file
+        self.setting_labels = buildSettingLabels(self.setting_options, self.settings)
+        self.fix_width_settings = "123456789123456789"
+
         self.menu_layout = computeListLayout(self.menu_options, 128, 24, 24, "grid") # Calculate positions of options in a grid layout
         self.leaderboard_layout = computeListLayout(self.leaderboard_options, 128, 24, 24, "grid")
-        self.settings_layout = computeListLayout(self.setting_options, 128, 24, 24, "grid")
+        self.settings_layout = computeListLayout(self.setting_labels, 128, 24, 24, "grid", self.fix_width_settings)
         self.graphics_layout = computeListLayout(self.graphics_options, 128, 24, 24, "grid")
         self.volume_layout = computeListLayout(self.volume_options, 128, 24, 24, "grid")
-
-        self.settings = load_config() # Load the saved settings from the config file
 
         self.last_fps_time = pyxel.frame_count # Track FPS
         self.fps = 0

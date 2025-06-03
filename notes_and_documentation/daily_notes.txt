@@ -70,3 +70,10 @@ also adds a ceiling when the spawn cap is hit on the menu so the balls can bounc
 - Separated the calculation logic of a menu's grid of options from the drawing of the options
 - Previous change led to calculating all menu grids 1 time in __init__() instead of 1 time every frame
 - Added ability to toggle the FPS Display
+
+6/2/2025
+- Changed settings to be loaded through a config file so that they save across game instances
+- Setting names can be dynamically updated now
+- Added ability to toggle on/off cursor (no game functionality yet)
+
+As I suspected, I can't do a windowed/borderless or aspect ratio setting with Pyxel without restarting game, might do that eventually though
