@@ -80,3 +80,9 @@ As I suspected, I can't do a windowed/borderless or aspect ratio setting with Py
 
 6/3/2025
 - Changed FPS to 60 and adjusted Ball and Player speeds to match
+
+6/7/2025
+- Created another color palette and the ability to swap palettes mid game easily
+- Added a floating leaf background visual to the Leaderboards menu
+
+Spent a ton of time looking into how Pyxel palettes work, how to swap them mid game, and their color limitations

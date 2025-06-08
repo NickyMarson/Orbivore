@@ -3,8 +3,10 @@ import json
 import os
 import random
 
+from import_variables.palettes import palette_list
 from import_classes.player import Player
 from import_classes.ball import Ball
+from import_classes.leaf import Leaf
 from import_functions.list_utils import buildSettingLabels, computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
 from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
@@ -25,17 +27,24 @@ def save_config(settings): # Saves settings in config file
     with open("config.json", "w") as f:
         json.dump(settings, f, indent=4)
 
+# --------------------HELPER FUNCTIONS--------------------
+
+def apply_palette(palette_name):
+    palette = palette_list[palette_name] # Get palette dict coresponding to palette_name
+    for i, hex_color in palette.items():
+        pyxel.colors[i] = hex_color  # Apply hex_color to palette index
+
 # --------------------APP CLASS--------------------
 
 class App:
     def __init__(self): # Constructor for the App class
         pyxel.init(256, 256, title="Salutations Huzz", fps=60, quit_key=pyxel.KEY_ESCAPE) # Initialize window (Width, Height, Quit Key)
+        apply_palette("edited") # Use default palette
 
         self.initializeInstanceVars() # Initialize all instance variables
-
         pyxel.load("sprite_sheet.pyxres")
-
         self.startMenu()
+        self.startLeaves()
 
         pyxel.run(self.update, self.draw) # Starts game loop, call update on self, then call draw on self at 30 FPS
 
@@ -89,7 +98,7 @@ class App:
 
         # If spawn timer reached 60 frames and spawn cap not reached
         if self.menu_spawn_timer >= self.menu_spawn_interval and len(self.menu_balls) < self.menu_spawn_cap:
-            self.menu_balls.append(Ball(8, 8)) # Create a Ball instance and add it to the Ball array
+            self.menu_balls.append(Ball(8,8)) # Create a Ball instance and add it to the Ball array
             self.menu_spawn_timer = 0 # Reset spawn timer
 
         if pyxel.btnp(pyxel.KEY_EQUALS): # Cheat button >:(
@@ -139,6 +148,8 @@ class App:
             self.exit_state()
 
     def updateLeaderboards(self):
+        self.spawnLeaves()
+        
         new_index, new_prev_col = self.changeCursorPosition(len(self.leaderboard_options), 2, self.current_state, self.current_state, "grid")
         
         self.selected_leaderboard = new_index # Update cursor position
@@ -146,6 +157,7 @@ class App:
         self.prev_col = new_prev_col
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
+            self.clearLeaves()
             self.exit_state()
 
     def updateSettings(self):
@@ -290,6 +302,9 @@ class App:
         drawCarousel(self.start_options, self.selected_start, 128, 16, 6, 0, 7, 8)
     
     def drawLeaderboards(self):
+        for leaf in self.leaves:
+            leaf.draw()
+
         pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 7)
         self.selected_leaderboard = getattr(self, "selected_leaderboard", 0)  # Initialize if not set
         drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, self.leaderboard_layout, 6, 0, 7)
@@ -331,7 +346,7 @@ class App:
         self.score = 0
         self.spawn_timer = 0
 
-    def startMenu(self): # Create balls for main menu background visual
+    def startMenu(self): # Initialize ball variables for main menu background visual
         self.menu_balls = []
         self.menu_spawn_timer = 0
         self.menu_spawn_interval = 60
@@ -355,6 +370,27 @@ class App:
         self.prev_col_map[prev_col_map_key] = new_prev_col # Update previous column index
 
         return new_index, new_prev_col
+    
+    def startLeaves(self): # Initialize leaf variables for background visual
+        self.leaves = []
+        self.leaf_spawn_timer = 0
+        self.leaf_spawn_interval = 60
+        self.leaf_spawn_cap = 100
+
+    def clearLeaves(self): # Clears leaf objects to stop possible memory issues
+        self.leaves.clear()
+        self.leaf_spawn_timer = 0
+
+    def spawnLeaves(self): # Spawns and updates leaves
+        self.leaf_spawn_timer += 1 # Increment spawn timer every frame
+
+        # If spawn timer reached 60 frames and spawn cap not reached
+        if self.leaf_spawn_timer >= self.leaf_spawn_interval and len(self.leaves) < self.leaf_spawn_cap:
+            self.leaves.append(Leaf()) # Create a Leaf instance and add it to the Leaves array
+            self.leaf_spawn_timer = 0 # Reset spawn timer
+
+        for leaf in self.leaves:
+            leaf.update()
 
     def enter_state(self, new_state): # Linked list approach to states and cursor position (enter state)
         if self.current_state:

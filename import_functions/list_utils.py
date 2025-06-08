@@ -68,7 +68,7 @@ def computeListLayout(options, y_start, spacing_x, spacing_y, mode, fix_width=No
 
 # Draws all options from the input parameters
 def drawOptionList(title, options, selected_index, layout, color_selected_bg, color_selected_text, color_unselected_text, settings=None):
-    pyxel.text(centerTextHorizontal(title), 50, title, 14)
+    pyxel.text(centerTextHorizontal(title), 50, title, 3)
 
     for option in options: # Loop over each option in the list, get its data, then draw the option using that data
         opt_data = layout[option]
