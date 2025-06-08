@@ -9,8 +9,8 @@ class Player:
         self.vx = 0 # Velocity
         self.vy = 0
 
-        self.accel = 0.4 # Acceleration
-        self.max_speed = 6 # Maximum speed possible
+        self.accel = 0.2 # Acceleration
+        self.max_speed = 3 # Maximum speed possible
         self.friction = 0.95 # Friction coefficient
         self.radius = 8 # Player radius
 

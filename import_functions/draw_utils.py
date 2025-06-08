@@ -31,7 +31,7 @@ def drawArrowSprites(options, selected_index, y_start, spacing_x, color_key):
     pyxel.blt(rect_x + fixed_rect_width + 2, y - 5, 0, 0, 0, 16, 16, color_key)  # -> (0, 0) to (15, 15)
     pyxel.blt(rect_x - 18, y - 5, 0, 16, 0, 16, 16, color_key)  # <- (16, 0) to (31, 15)
 
-def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg, color_selected_text, color_unselected_text):
+def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg, color_selected_text, color_unselected_text, margin=4):
     max_option_len = max(len(opt) for opt in options)
     fixed_rect_width = max_option_len * 4 + 10 # 4px per character + 10px padding
     rect_height = 16
@@ -75,6 +75,5 @@ def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg,
 
     # Draw arrows
     arrow_y = y_start + (rect_height - 16) // 2
-    margin = 32 # Changes x distance from screen edge to option
     pyxel.blt(positions[2] + fixed_rect_width + margin, arrow_y, 0, 0, 0, 16, 16, 0) # -> between right screen edge and right option
     pyxel.blt(positions[0] - 16 - margin, arrow_y, 0, 16, 0, 16, 16, 0) # <- between left screen edge and left option

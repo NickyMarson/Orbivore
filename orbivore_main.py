@@ -29,7 +29,7 @@ def save_config(settings): # Saves settings in config file
 
 class App:
     def __init__(self): # Constructor for the App class
-        pyxel.init(256, 256, title="Salutations Huzz", quit_key=pyxel.KEY_ESCAPE) # Initialize window (Width, Height, Quit Key)
+        pyxel.init(256, 256, title="Salutations Huzz", fps=60, quit_key=pyxel.KEY_ESCAPE) # Initialize window (Width, Height, Quit Key)
 
         self.initializeInstanceVars() # Initialize all instance variables
 
@@ -61,11 +61,11 @@ class App:
         elif self.current_state == "volume":
             self.updateVolume()
 
-        if pyxel.frame_count - self.last_fps_time >= 30:
-            self.fps = 30 # Pyxel runs at a fixed 30 FPS
+        if pyxel.frame_count - self.last_fps_time >= 60:
+            self.fps = 60 # Pyxel should run at 60 FPS
             self.last_fps_time = pyxel.frame_count # Count number of frames to get FPS
 
-        if self.settings["Control Mode"] == "Keyboard and Mouse": # KB+M so get mouse position
+        if self.settings["Control Mode"] == "Keyboard & Mouse": # KB+M so get mouse position
             mouse_x = pyxel.mouse_x
             mouse_y = pyxel.mouse_y
 
@@ -132,7 +132,7 @@ class App:
         if pyxel.btnp(pyxel.KEY_RETURN):
             selected_option = self.start_options[self.selected_start]
 
-            if selected_option == "Yo":
+            if selected_option == "Normal Game":
                 self.startGame() # Initialize objects for game
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
@@ -179,7 +179,6 @@ class App:
                 save_config(self.settings) # Save setting to config file
                 self.setting_labels = buildSettingLabels(self.setting_options, self.settings)
                 self.settings_layout = computeListLayout(self.setting_labels, 128, 24, 24, "grid", self.fix_width_settings)
-            print(selected_option)
 
         if pyxel.btnp(pyxel.KEY_M): # If M is pressed, go back to menu
             self.exit_state()
@@ -254,13 +253,11 @@ class App:
         elif self.current_state == "volume":
             self.drawVolume()
         
-        self.globalDraw()
-
-        if self.settings["Control Mode"] == "Keyboard & Mouse":
-            pyxel.circ(pyxel.mouse_x, pyxel.mouse_y, 2, 7) # Draw cursor
+        self.drawGlobal()
+        self.drawGlobalSettings()
 
 
-    def globalDraw(self): # Draws everything that should (almost) always be on screen
+    def drawGlobal(self): # Draws everything that should (almost) always be on screen
         show_back_arrow = False
         # Checks if last button press was within the last 5 seconds, if so then display back arrow
         if self.last_input_frame is not None:
@@ -271,8 +268,12 @@ class App:
             pyxel.blt(4, 4, 2, 0, 0, 16, 19, 0) # Back arrow
             pyxel.blt(20, 2, 1, 0, 0, 11, 11, 0) # M for back arrow key instructions
 
+    def drawGlobalSettings(self): # Draws everything that should be on screen based on saved settings
         if self.settings["FPS Display"] == True:
             pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
+
+        if self.settings["Control Mode"] == "Keyboard & Mouse":
+            pyxel.circ(pyxel.mouse_x, pyxel.mouse_y, 2, 7) # Draw cursor
 
     def drawMenu(self): # Draws menu
         for ball in self.menu_balls:
@@ -286,7 +287,7 @@ class App:
 
     def drawStart(self):
         pyxel.text(centerTextHorizontal("Start"), 50, "Start", 7)
-        drawCarousel(self.start_options, self.selected_start, 128, 24, 6, 0, 7)
+        drawCarousel(self.start_options, self.selected_start, 128, 16, 6, 0, 7, 8)
     
     def drawLeaderboards(self):
         pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 7)
@@ -320,7 +321,7 @@ class App:
         self.player = Player(80, 60) # Create an instance of a player at (X, Y)
         self.balls = [] # Array of balls
         self.spawn_timer = 0 # Set spawn timer to 0
-        self.spawn_interval = 45 # Number of frames between ball spawns, lower = more spawns
+        self.spawn_interval = 90 # Number of frames between ball spawns, lower = more spawns
         self.spawn_cap = 100 # Spawn cap for number of balls
         self.score = 0 # Game score
     
@@ -333,7 +334,7 @@ class App:
     def startMenu(self): # Create balls for main menu background visual
         self.menu_balls = []
         self.menu_spawn_timer = 0
-        self.menu_spawn_interval = 30
+        self.menu_spawn_interval = 60
         self.menu_spawn_cap = 100
 
     def clearMenu(self): # Clears main menu objects to stop possible memory issues
@@ -381,7 +382,7 @@ class App:
         self.prev_col_map = {} # Tracks previous column
 
         self.menu_options = ["Start", "Leaderboards", "Settings"]
-        self.start_options = ["Gurt", "Yo", "Ts"]
+        self.start_options = ["Gurt", "Normal Game", "Ts"]
         self.leaderboard_options = ["Gurt: Yo", "Yo: Gurt", "Rt: Ts is option 3", "3: WHAAAAAT"]
         self.setting_options = ["Controls", "Volume", "Graphics", "Aspect Ratio", "Control Mode", "FPS Display"]
         self.graphics_options = ["Main Menu Balls", "Colorblind Mode"]

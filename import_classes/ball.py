@@ -7,9 +7,9 @@ class Ball:
         self.radius = radius
         self.x = random.uniform(radius, pyxel.width - 1 - radius)
         self.y = -radius
-        self.vx = random.uniform(-1, 1) # Generate random velocity between a and b
+        self.vx = random.uniform(-0.5, 0.5) # Generate random velocity between a and b
         self.vy = 0
-        self.gravity = random.uniform(0.2, 1) # Gravity to make balls fall
+        self.gravity = random.uniform(0.1, 0.5) # Gravity to make balls fall
 
         self.top_boundary = False # Bool for opening and closing top of screen boundary
 
