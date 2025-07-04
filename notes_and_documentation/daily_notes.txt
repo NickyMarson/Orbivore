@@ -2,10 +2,11 @@ Active Bugs:
 b2-el
 
 Squashed Bugs:
-b0-m, b1-mh, b3-lm
+b0-m, b1-mh, b3-lm, b4-el
 
 -el = Extremely Low Priority, -l = Low Priority, -lm = Low/Medium Priority, -m = Medium Priority, -mh = Medium/High Priority,
 -h = High Priority, -c = Critical/Game Breaking
+
 
 4/22/2025:
 - Wanted to make a simple game, investigated pyxel
@@ -86,3 +87,11 @@ As I suspected, I can't do a windowed/borderless or aspect ratio setting with Py
 - Added a floating leaf background visual to the Leaderboards menu
 
 Spent a ton of time looking into how Pyxel palettes work, how to swap them mid game, and their color limitations
+
+7/4/2025
+- Created another new color palette and edited the sprites to correspond
+- Fixed right facing arrow for the FPS display option being upside down due to rotating by 180 degrees instead of using -width (b4)
+- Created item sprites for a Baseball Bat and a Bomb
+
+Looked into color palettes in general and settled on a new one
+Was super busy with summer school so haven't had free time to work on this

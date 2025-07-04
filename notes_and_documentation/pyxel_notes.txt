@@ -1,5 +1,7 @@
 Colors:
-0-15 (0=Black 7=White 11=Light Green)
+0-15 (0: Black, 11: Olive Green, 15 Off White)
+2, 4, 5, 6, 8, 9, 10, 12, 13, 14 (ball colors)
+0, 1, 3, 7, 10, 11, 15 (non ball colors)
 
 Sprite Editor:
 pyxel edit sprite_sheet.pyxres

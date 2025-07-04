@@ -33,8 +33,26 @@ palette_list = {
         10: 0x0F4D0F, # Dark Green         + (Leaf)
         11: 0x70C6A9, # Seafoam/Mint Green ! (Player color/FPS Display)
         12: 0x7696DE, # Medium Light Blue  ! (Arrow)
-        13: 0x008000, # Green              + (Leaf)
+        13: 0x008000, # Green              
         14: 0x2D9F2D, # Forest Green       + (Leaf)
-        15: 0x5CE65C # Light Green         + (Leaf)
+        15: 0x5CE65C # Light Green         
+    },
+    "DawnBringer": {
+        0: 0x140C1C, # Black               (Background)
+        1: 0x442434, # Dark Plum/Brown
+        2: 0x30346D, # Dark Blue           (Arrow)
+        3: 0x4E4A4E, # Dark Gray
+        4: 0x854C30, # Dirt Brown
+        5: 0x346524, # Forest Green        (Leaf)
+        6: 0xD04648, # Reddish Pink
+        7: 0x757161, # Gray
+        8: 0x597DCE, # Sky Blue            (Arrow)
+        9: 0xD27D2C, # Orange
+        10: 0x8595A1, # Light Gray
+        11: 0x6DAA2C, # Olive Green        (Player color/FPS Display/Leaf)
+        12: 0xD2AA99, # Tan
+        13: 0x6DC2CA, # Near Turquoise     (Arrow)
+        14: 0xDAD45E, # Yellow
+        15: 0xDEEED6 # Off White           (Object outline)
     }
 }

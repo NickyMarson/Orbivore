@@ -9,7 +9,7 @@ def drawSmallArrow(option, layout, option_state):
 
     if option_state == True:
         arrow_x = info["rect_x"] + info["width"] - arrow_width - arrow_margin
-        pyxel.blt(arrow_x, arrow_y, 0, 32, 2, 8, 12, 0, 180) # > inside option
+        pyxel.blt(arrow_x, arrow_y, 0, 32, 2, -8, 12, 0, 0) # > inside option
     elif option_state == False:
         arrow_x = info["rect_x"] + arrow_margin
         pyxel.blt(arrow_x, arrow_y, 0, 32, 2, 8, 12, 0, 0) # < inside option
@@ -66,11 +66,11 @@ def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg,
 
         # Draw rect and text
         if opt_idx == selected_index:
-            pyxel.rectb(pos_x, y, fixed_rect_width, rect_height, 5)
+            pyxel.rectb(pos_x, y, fixed_rect_width, rect_height, 8)
             pyxel.rect(pos_x, y, fixed_rect_width, rect_height, color_selected_bg)
             pyxel.text(text_x, text_y, option, color_selected_text)
         else:
-            pyxel.rectb(pos_x, y, fixed_rect_width, rect_height, 5)
+            pyxel.rectb(pos_x, y, fixed_rect_width, rect_height, 8)
             pyxel.text(text_x, text_y, option, color_unselected_text)
 
     # Draw arrows

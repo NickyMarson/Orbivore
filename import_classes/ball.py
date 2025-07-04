@@ -13,7 +13,7 @@ class Ball:
 
         self.top_boundary = False # Bool for opening and closing top of screen boundary
 
-        excluded_colors = {0, 7, player_color} # Background, Text, Player Colors
+        excluded_colors = {0, 1, 3, 7, 10, 15, player_color} # Background, Text, Player Colors
         available_colors = [c for c in range(16) if c not in excluded_colors]
         self.color = random.choice(available_colors) # Select a color from the available colors for the current ball color
 

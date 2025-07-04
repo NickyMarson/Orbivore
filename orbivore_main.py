@@ -39,7 +39,7 @@ def apply_palette(palette_name):
 class App:
     def __init__(self): # Constructor for the App class
         pyxel.init(256, 256, title="Salutations Huzz", fps=60, quit_key=pyxel.KEY_ESCAPE) # Initialize window (Width, Height, Quit Key)
-        apply_palette("edited") # Use default palette
+        apply_palette("DawnBringer") # Use default palette
 
         self.initializeInstanceVars() # Initialize all instance variables
         pyxel.load("sprite_sheet.pyxres")
@@ -285,49 +285,49 @@ class App:
             pyxel.text(5, pyxel.height - 10, f"FPS: {self.fps}", 11) # FPS counter
 
         if self.settings["Control Mode"] == "Keyboard & Mouse":
-            pyxel.circ(pyxel.mouse_x, pyxel.mouse_y, 2, 7) # Draw cursor
+            pyxel.circ(pyxel.mouse_x, pyxel.mouse_y, 2, 15) # Draw cursor
 
     def drawMenu(self): # Draws menu
         for ball in self.menu_balls:
             ball.draw()
 
-        drawOptionList("Orbivore", self.menu_options, self.selected_menu, self.menu_layout, 6, 0, 7) # Draw the grid
+        drawOptionList("Orbivore", self.menu_options, self.selected_menu, self.menu_layout, 13, 0, 15) # Draw the grid
         menu_instruction = "Use arrow keys to move between options"
         menu_instruction_2 = "ENTER to confirm, Q to quit game"
-        pyxel.text(centerTextHorizontal(menu_instruction), 180, menu_instruction, 5) # Menu instructions
-        pyxel.text(centerTextHorizontal(menu_instruction_2), 190, menu_instruction_2, 5) # Menu instructions
+        pyxel.text(centerTextHorizontal(menu_instruction), 180, menu_instruction, 8) # Menu instructions
+        pyxel.text(centerTextHorizontal(menu_instruction_2), 190, menu_instruction_2, 8) # Menu instructions
 
     def drawStart(self):
-        pyxel.text(centerTextHorizontal("Start"), 50, "Start", 7)
-        drawCarousel(self.start_options, self.selected_start, 128, 16, 6, 0, 7, 8)
+        pyxel.text(centerTextHorizontal("Start"), 50, "Start", 8)
+        drawCarousel(self.start_options, self.selected_start, 128, 16, 13, 0, 15, 8)
     
     def drawLeaderboards(self):
         for leaf in self.leaves:
             leaf.draw()
 
-        pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 7)
+        pyxel.text(centerTextHorizontal("Leaderboards"), 50, "Leaderboards", 8)
         self.selected_leaderboard = getattr(self, "selected_leaderboard", 0)  # Initialize if not set
-        drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, self.leaderboard_layout, 6, 0, 7)
+        drawOptionList("Leaderboards", self.leaderboard_options, self.selected_leaderboard, self.leaderboard_layout, 13, 0, 15)
 
     def drawSettings(self):
-        pyxel.text(centerTextHorizontal("Settings"), 50, "Settings", 7)
-        drawOptionList("Settings", self.setting_labels, self.selected_settings, self.settings_layout, 6, 0, 7, self.settings)
+        pyxel.text(centerTextHorizontal("Settings"), 50, "Settings", 8)
+        drawOptionList("Settings", self.setting_labels, self.selected_settings, self.settings_layout, 13, 0, 15, self.settings)
         drawSmallArrow("FPS Display", self.settings_layout, self.settings["FPS Display"]) # Draws < or > arrow inside FPS Display option
 
     def drawGraphics(self):
-        pyxel.text(centerTextHorizontal("Graphics"), 50, "Graphics", 7)
-        drawOptionList("Graphics", self.graphics_options, self.selected_graphics, self.graphics_layout, 6, 0, 7)
+        pyxel.text(centerTextHorizontal("Graphics"), 50, "Graphics", 8)
+        drawOptionList("Graphics", self.graphics_options, self.selected_graphics, self.graphics_layout, 13, 0, 15)
 
     def drawVolume(self):
-        pyxel.text(centerTextHorizontal("Volume"), 50, "Volume", 7)
-        drawOptionList("Volume", self.volume_options, self.selected_volume, self.volume_layout, 6, 0, 7)
+        pyxel.text(centerTextHorizontal("Volume"), 50, "Volume", 8)
+        drawOptionList("Volume", self.volume_options, self.selected_volume, self.volume_layout, 13, 0, 15)
 
     def drawGame(self): # Draws game
         self.player.draw() # Draw player
         for ball in self.balls: # Draw balls
             ball.draw()
 
-        pyxel.text(5, 5, f"Score: {self.score}", 7) # Draw game score (X, Y, String, Text Color)
+        pyxel.text(5, 5, f"Score: {self.score}", 8) # Draw game score (X, Y, String, Text Color)
 
     # --------------------OTHER APP FUNCTIONS--------------------
 
