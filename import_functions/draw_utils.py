@@ -77,3 +77,35 @@ def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg,
     arrow_y = y_start + (rect_height - 16) // 2
     pyxel.blt(positions[2] + fixed_rect_width + margin, arrow_y, 0, 0, 0, 16, 16, 0) # -> between right screen edge and right option
     pyxel.blt(positions[0] - 16 - margin, arrow_y, 0, 16, 0, 16, 16, 0) # <- between left screen edge and left option
+
+def alignItemBoxText(x_start, y_start, width, height, text):
+    text_width = len(text) * 4
+    x_centered = x_start + (width - text_width) / 2
+    y_text = y_start + height + 3
+
+    return x_centered, y_text
+
+def drawItemBox(x_start, y_start, width, height, color, text):
+    pyxel.rectb(x_start, y_start, width, height, color)
+
+    x_centered, y_text = alignItemBoxText(x_start, y_start, width, height, text)
+    pyxel.text(x_centered, y_text, text, color)
+
+def drawItemAnimation(x_start, y_start, width, height, text):
+    width_letter = 4
+    height_letter = 6
+    imgbank = 1
+    x_centered, y_text = alignItemBoxText(x_start, y_start, width, height, text)
+
+    # 6 frames at 60 FPS = 100 ms
+    # 0-5 (1), 6-11 (2), 12-17 (3), 18-23 (4), 24-29 (5), 30-35 (6), 36-41 (7), 42-47 (8), 48-53 (9)
+
+    step = pyxel.frame_count // 6 # Floor divide current frame by 6 frames per color
+
+    for i in range (0, 4):
+        color_offset = (step + i) % 9 # Can be any of 9 colors based on a 6 frame step
+        u_imgbank = color_offset * 4 # Each letter in imgbank is 4 pixels horizontally apart
+        v_imgbank = 56 + i * 8 # Each letter in imgbank is 8 pixels vertically apart and starts at v = 56
+
+        pyxel.blt(x_centered, y_text, imgbank, u_imgbank, v_imgbank, width_letter, height_letter, 0) # Draw a letter
+        x_centered += width_letter # Update x position for next letter

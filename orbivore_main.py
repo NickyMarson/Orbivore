@@ -8,7 +8,7 @@ from import_classes.player import Player
 from import_classes.ball import Ball
 from import_classes.leaf import Leaf
 from import_functions.list_utils import buildSettingLabels, computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
-from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel
+from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel, drawItemBox, drawItemAnimation
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
 
 # --------------------CONFIG FUNCTIONS--------------------
@@ -326,6 +326,10 @@ class App:
         self.player.draw() # Draw player
         for ball in self.balls: # Draw balls
             ball.draw()
+
+        drawItemBox(5, 15, 25, 25, 15, "ITEM") # Draw item box border
+        if pyxel.btn(pyxel.KEY_0):
+            drawItemAnimation(5, 15, 25, 25, "ITEM")
 
         pyxel.text(5, 5, f"Score: {self.score}", 8) # Draw game score (X, Y, String, Text Color)
 
