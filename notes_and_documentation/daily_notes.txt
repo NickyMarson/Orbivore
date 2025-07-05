@@ -99,5 +99,7 @@ Was super busy with summer school so haven't had free time to work on this
 7/4/2025
 - Created Item Box for game
 - Added ITEM text and animation depending on whether the player doesn't or does have an item
+- Greatly improved Baseball Bat and Bomb sprites
+- Set up item system to randomly give an item after 3 seconds and player can "use" item with 0, currently just consumes item
 
 Starting to add more real features to the game and stop doing menu stuff and optimization

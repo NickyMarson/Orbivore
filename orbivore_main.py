@@ -8,7 +8,7 @@ from import_classes.player import Player
 from import_classes.ball import Ball
 from import_classes.leaf import Leaf
 from import_functions.list_utils import buildSettingLabels, computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
-from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel, drawItemBox, drawItemAnimation
+from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel, drawItemBox, drawItemAnimation, drawItem, randomizeItem
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
 
 # --------------------CONFIG FUNCTIONS--------------------
@@ -244,6 +244,17 @@ class App:
                 alive.append(ball) # Ball and player didn't collide so append to to alive array
         self.balls = alive # Keep all balls that didn't collide with player, avoids lag by ignoring balls that collided
 
+        self.item_spawn_timer += 1
+        if self.item_spawn_timer >= self.item_spawn_interval and not self.hasItem:
+            self.item_name = randomizeItem()
+            self.hasItem = True
+
+        if self.hasItem:
+            if pyxel.btn(pyxel.KEY_0):
+                self.hasItem = False
+                self.item_name = ""
+                self.item_spawn_timer = 0
+
     # --------------------DRAW FUNCTIONS--------------------
 
     def draw(self): # Draws whichever state is currently active
@@ -328,8 +339,11 @@ class App:
             ball.draw()
 
         drawItemBox(5, 15, 25, 25, 15, "ITEM") # Draw item box border
-        if pyxel.btn(pyxel.KEY_0):
-            drawItemAnimation(5, 15, 25, 25, "ITEM")
+
+        if self.hasItem:
+            drawItemAnimation(5, 15, 25, 25, "ITEM") # Draw rainbow strobe for ITEM text
+            drawItem(5, 15, 25, 25, "ITEM", self.item_name) # Draw item inside item box
+                
 
         pyxel.text(5, 5, f"Score: {self.score}", 8) # Draw game score (X, Y, String, Text Color)
 
@@ -343,6 +357,11 @@ class App:
         self.spawn_interval = 90 # Number of frames between ball spawns, lower = more spawns
         self.spawn_cap = 100 # Spawn cap for number of balls
         self.score = 0 # Game score
+
+        self.item_name = ""
+        self.item_spawn_timer = 0
+        self.item_spawn_interval = 180 # 3 seconds
+        self.hasItem = False
     
     def clearGame(self): # Clears game objects to stop possible memory issues
         self.player = None # Delete player object

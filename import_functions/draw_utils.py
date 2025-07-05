@@ -1,5 +1,7 @@
 # Extra draw functions not related to a specific state
 import pyxel
+import random
+from import_variables.items import item_list
 
 def drawSmallArrow(option, layout, option_state):
     info = layout[option]
@@ -78,24 +80,24 @@ def drawCarousel(options, selected_index, y_start, spacing_x, color_selected_bg,
     pyxel.blt(positions[2] + fixed_rect_width + margin, arrow_y, 0, 0, 0, 16, 16, 0) # -> between right screen edge and right option
     pyxel.blt(positions[0] - 16 - margin, arrow_y, 0, 16, 0, 16, 16, 0) # <- between left screen edge and left option
 
-def alignItemBoxText(x_start, y_start, width, height, text):
-    text_width = len(text) * 4
-    x_centered = x_start + (width - text_width) / 2
+def alignItemBoxText(x_start, y_start, width_box, height, text):
+    width_text = len(text) * 4
+    x_centered = x_start + (width_box - width_text) / 2
     y_text = y_start + height + 3
 
     return x_centered, y_text
 
-def drawItemBox(x_start, y_start, width, height, color, text):
-    pyxel.rectb(x_start, y_start, width, height, color)
+def drawItemBox(x_start, y_start, width_box, height_box, color, text):
+    pyxel.rectb(x_start, y_start, width_box, height_box, color)
 
-    x_centered, y_text = alignItemBoxText(x_start, y_start, width, height, text)
+    x_centered, y_text = alignItemBoxText(x_start, y_start, width_box, height_box, text)
     pyxel.text(x_centered, y_text, text, color)
 
-def drawItemAnimation(x_start, y_start, width, height, text):
+def drawItemAnimation(x_start, y_start, width_box, height_box, text):
     width_letter = 4
     height_letter = 6
     imgbank = 1
-    x_centered, y_text = alignItemBoxText(x_start, y_start, width, height, text)
+    x_centered, y_text = alignItemBoxText(x_start, y_start, width_box, height_box, text)
 
     # 6 frames at 60 FPS = 100 ms
     # 0-5 (1), 6-11 (2), 12-17 (3), 18-23 (4), 24-29 (5), 30-35 (6), 36-41 (7), 42-47 (8), 48-53 (9)
@@ -109,3 +111,20 @@ def drawItemAnimation(x_start, y_start, width, height, text):
 
         pyxel.blt(x_centered, y_text, imgbank, u_imgbank, v_imgbank, width_letter, height_letter, 0) # Draw a letter
         x_centered += width_letter # Update x position for next letter
+
+def drawItem(x_start, y_start, width_box, height_box, text, item_name):
+    item = item_list[item_name]
+    imgbank = item["imgbank"]
+    u_imgbank = item["u_imgbank"]
+    v_imgbank = item["v_imgbank"]
+    height_item = item["height_item"]
+    width_item = item["width_item"]
+
+    x_centered = x_start + (width_box - width_item) / 2
+    y_centered = y_start + (height_box - height_item) / 2
+
+    pyxel.blt(x_centered, y_centered, imgbank, u_imgbank, v_imgbank, width_item, height_item, 0)
+
+def randomizeItem():
+    item_name = random.choice(list(item_list.keys()))
+    return item_name
