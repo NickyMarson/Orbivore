@@ -103,3 +103,8 @@ Was super busy with summer school so haven't had free time to work on this
 - Set up item system to randomly give an item after 3 seconds and player can "use" item with 0, currently just consumes item
 
 Starting to add more real features to the game and stop doing menu stuff and optimization
+
+7/6/2025
+- Created dictionary system for used in game items
+- Added GameItem class as an object for the items
+- Created 4 frames for a Bomb throw and explosion

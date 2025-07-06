@@ -7,6 +7,7 @@ from import_variables.palettes import palette_list
 from import_classes.player import Player
 from import_classes.ball import Ball
 from import_classes.leaf import Leaf
+from import_classes.game_item import GameItem
 from import_functions.list_utils import buildSettingLabels, computeListLayout, drawOptionList, handleVerticalList, handleHorizontalList, handleGridSelection
 from import_functions.draw_utils import drawSmallArrow, drawArrowSprites, drawCarousel, drawItemBox, drawItemAnimation, drawItem, randomizeItem
 from import_functions.other_utils import centerTextHorizontal, any_key_pressed
@@ -228,32 +229,44 @@ class App:
 
         self.player.update() # Update player
 
-        self.spawn_timer += 1 # Increment spawn timer every frame
 
+        # Ball spawning and collision
+        self.spawn_timer += 1 # Increment spawn timer every frame
         # If spawn timer reached 60 frames and spawn cap not reached
         if self.spawn_timer >= self.spawn_interval and len(self.balls) < self.spawn_cap:
             self.balls.append(Ball(8, 8)) # Create a Ball instance and add it to the Ball array
             self.spawn_timer = 0 # Reset spawn timer
 
-        alive = [] # Array of balls that are alive
+        alive_balls = [] # Array of balls that are alive
         for ball in self.balls:
             ball.update()
-            if ball.collides_with(self.player):
+            if ball.collides_with_player(self.player):
                 self.score += 1 # Ball and player collided so increment score
             else:
-                alive.append(ball) # Ball and player didn't collide so append to to alive array
-        self.balls = alive # Keep all balls that didn't collide with player, avoids lag by ignoring balls that collided
+                alive_balls.append(ball) # Ball and player didn't collide so append to to alive array
+        self.balls = alive_balls # Keep all balls that didn't collide with player, avoids lag by ignoring balls that collided
 
+
+        # Item spawning and usage
         self.item_spawn_timer += 1
-        if self.item_spawn_timer >= self.item_spawn_interval and not self.hasItem:
+        if self.item_spawn_timer >= self.item_spawn_interval and not self.hasItem: # Spawn item after x amount of time
             self.item_name = randomizeItem()
             self.hasItem = True
 
         if self.hasItem:
-            if pyxel.btn(pyxel.KEY_0):
+            if pyxel.btn(pyxel.KEY_SPACE): # Use item
+                self.items.append(GameItem(self.item_name, 50, 50))
+                # save direction of item spawn
                 self.hasItem = False
                 self.item_name = ""
                 self.item_spawn_timer = 0
+
+        alive_items = []
+        for item in self.items:
+            item.update()
+            if not item.anim_finished:
+                alive_items.append(item)
+        self.items = alive_items
 
     # --------------------DRAW FUNCTIONS--------------------
 
@@ -362,6 +375,7 @@ class App:
         self.item_spawn_timer = 0
         self.item_spawn_interval = 180 # 3 seconds
         self.hasItem = False
+        self.items = []
     
     def clearGame(self): # Clears game objects to stop possible memory issues
         self.player = None # Delete player object

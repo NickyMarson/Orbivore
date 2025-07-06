@@ -50,7 +50,7 @@ class Ball:
     def draw(self):
         pyxel.circ(int(self.x), int(self.y), self.radius, self.color)
 
-    def collides_with(self, player):
+    def collides_with_player(self, player):
         dx = self.x - player.x # Difference in x and y between ball and player
         dy = self.y - player.y
         r = self.radius + player.radius # Total radius of player and ball combined

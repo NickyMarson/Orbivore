@@ -1,7 +1,7 @@
 # Extra draw functions not related to a specific state
 import pyxel
 import random
-from import_variables.items import item_list
+from import_variables.items import item_sprites
 
 def drawSmallArrow(option, layout, option_state):
     info = layout[option]
@@ -104,7 +104,7 @@ def drawItemAnimation(x_start, y_start, width_box, height_box, text):
 
     step = pyxel.frame_count // 6 # Floor divide current frame by 6 frames per color
 
-    for i in range (0, 4):
+    for i in range (0, 4): # Draw 4 letters
         color_offset = (step + i) % 9 # Can be any of 9 colors based on a 6 frame step
         u_imgbank = color_offset * 4 # Each letter in imgbank is 4 pixels horizontally apart
         v_imgbank = 56 + i * 8 # Each letter in imgbank is 8 pixels vertically apart and starts at v = 56
@@ -113,7 +113,7 @@ def drawItemAnimation(x_start, y_start, width_box, height_box, text):
         x_centered += width_letter # Update x position for next letter
 
 def drawItem(x_start, y_start, width_box, height_box, text, item_name):
-    item = item_list[item_name]
+    item = item_sprites[item_name]
     imgbank = item["imgbank"]
     u_imgbank = item["u_imgbank"]
     v_imgbank = item["v_imgbank"]
@@ -126,5 +126,5 @@ def drawItem(x_start, y_start, width_box, height_box, text, item_name):
     pyxel.blt(x_centered, y_centered, imgbank, u_imgbank, v_imgbank, width_item, height_item, 0)
 
 def randomizeItem():
-    item_name = random.choice(list(item_list.keys()))
+    item_name = random.choice(list(item_sprites.keys()))
     return item_name

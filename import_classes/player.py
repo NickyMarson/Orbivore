@@ -14,6 +14,8 @@ class Player:
         self.friction = 0.95 # Friction coefficient
         self.radius = 8 # Player radius
 
+        self.last_direction = 0
+
     def update(self):
         ax, ay = get_acceleration_input()
 
